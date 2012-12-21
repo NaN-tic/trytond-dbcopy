@@ -1,0 +1,75 @@
+# 
+msgid ""
+msgstr "Content-Type: text/plain; charset=utf-8\n"
+
+msgctxt "field:dbcopy.createdb.result,id:"
+msgid "ID"
+msgstr "ID"
+
+msgctxt "field:dbcopy.createdb.start,id:"
+msgid "ID"
+msgstr "ID"
+
+msgctxt "field:dbcopy.createdb.start,name:"
+msgid "DB Name"
+msgstr "Nom base de dades"
+
+msgctxt "model:dbcopy.createdb.result,name:"
+msgid "Create DB Copy"
+msgstr "Crea una base de dades copia"
+
+msgctxt "model:dbcopy.createdb.start,name:"
+msgid "Create DB Copy"
+msgstr "Crea una base de dades copia"
+
+msgctxt "model:ir.action,name:act_dbcopy_createdb"
+msgid "Create DB Copy"
+msgstr "Crea una base de dades copia"
+
+msgctxt "model:ir.ui.menu,name:menu_dbcopy"
+msgid "DB Copy"
+msgstr "Copia base de dades"
+
+msgctxt "model:ir.ui.menu,name:menu_dbcopy_createdb"
+msgid "Create DB Copy"
+msgstr "Crea una base de dades copia"
+
+msgctxt "view:dbcopy.createdb.result:"
+msgid "DB Copy"
+msgstr "Copia base de dades"
+
+msgctxt "view:dbcopy.createdb.result:"
+msgid "Tryton Server restart and generate new Database"
+msgstr ""
+"Servidor Tryton es reinicia i es comença a generar una nova base de dades"
+
+msgctxt "view:dbcopy.createdb.start:"
+msgid ""
+"Attention: Only you can clone a database if is equal to Tryton name server."
+msgstr ""
+"Atenció: Només pot clonar una base de dades si té el mateix nom que el "
+"servidor de Tryton."
+
+msgctxt "view:dbcopy.createdb.start:"
+msgid ""
+"Clone a production database to test it. This action need restart Tryton "
+"Server. Try to connect later."
+msgstr ""
+"Clona una base de dades de producció per a test. Aquesta acció necessita "
+"reiniciar el servidor de Tryton. Intenta conectar més tard."
+
+msgctxt "view:dbcopy.createdb.start:"
+msgid "DB Copy"
+msgstr "Copia base de dades"
+
+msgctxt "wizard_button:dbcopy.createdb,result,end:"
+msgid "Close"
+msgstr "Tanca"
+
+msgctxt "wizard_button:dbcopy.createdb,start,createdb:"
+msgid "Create database copy"
+msgstr "Crea una base de dades copia"
+
+msgctxt "wizard_button:dbcopy.createdb,start,end:"
+msgid "Cancel"
+msgstr "Cancel·la"

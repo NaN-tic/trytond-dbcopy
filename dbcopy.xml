@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<!-- This file is part dbcopy module for Tryton.
+The COPYRIGHT file at the top level of this repository contains the full copyright notices and license terms. -->
+<tryton>
+    <data>
+        <!-- Menu Top -->
+        <menuitem parent="ir.menu_administration" name="DB Copy" id="menu_dbcopy"/>
+
+        <record model="ir.ui.view" id="createdb_start_view_form">
+            <field name="model">dbcopy.createdb.start</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <![CDATA[
+                <form string="DB Copy">
+                    <group col="2" colspan="2" id="info">
+                        <label string="Clone a production database to test it. This action need restart Tryton Server. Try to connect later." id="clone" yalign="0.0" xalign="0.0" xexpand="1"/>
+                        <newline/>
+                        <label string="Attention: Only you can clone a database if is equal to Tryton name server." id="alert" yalign="0.0" xalign="0.0" xexpand="1"/>
+                    </group>
+                    <label name="name"/>
+                    <field name="name"/>
+                </form>
+                ]]>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="createdb_result_view_form">
+            <field name="model">dbcopy.createdb.result</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <![CDATA[
+                <form string="DB Copy">
+                    <label string="Tryton Server restart and generate new Database. Try to connect later." id="process" yalign="0.0" xalign="0.0" xexpand="1"/>
+                </form>
+                ]]>
+            </field>
+        </record>
+
+        <record model="ir.action.wizard" id="act_dbcopy_createdb">
+            <field name="name">Create DB Copy</field>
+            <field name="wiz_name">dbcopy.createdb</field>
+        </record>
+        <menuitem name="Create DB Copy"
+            parent="menu_dbcopy"
+            action="act_dbcopy_createdb"
+            id="menu_dbcopy_createdb"
+            sequence="40"/>
+    </data>
+</tryton>
