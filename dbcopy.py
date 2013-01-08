@@ -12,7 +12,7 @@ try:
     from erpdbcopy import version
 except ImportError:
     message = 'Unable to find ERP DB Copy Package'
-    logging.getLogger('magento').error(message)
+    logging.getLogger('dbcopy').error(message)
     raise Exception(message)
 
 __all__ = ['CreateDbStart', 'CreateDbResult', 'CreateDb']
