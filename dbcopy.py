@@ -9,7 +9,7 @@ import os
 import logging
 
 try:
-    from erpdbcopy import version
+    import erpdbcopy
 except ImportError:
     message = 'Unable to find ERP DB Copy Package'
     logging.getLogger('dbcopy').error(message)
