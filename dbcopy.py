@@ -7,9 +7,12 @@ from trytond.wizard import Wizard, StateView, StateTransition, Button
 from trytond.config import CONFIG
 import os
 import logging
+import threading
+import time
 
 try:
-    import erpdbcopy
+    from fabric.api import env, run
+    from fabric.tasks import execute
 except ImportError:
     message = 'Unable to find ERP DB Copy Package'
     logging.getLogger('dbcopy').error(message)
@@ -50,18 +53,29 @@ class CreateDb(Wizard):
             Button('Close', 'end', 'tryton-close'),
             ])
 
+    @staticmethod
+    def dbcopy(dbname):
+        env.host_string = "%(user)s@%(server)s:%(port)s" % {
+            'user': CONFIG['erpdbcopy_user'] or 'root',
+            'server': CONFIG['erpdbcopy_server'] or 'localhost',
+            'port': CONFIG['erpdbcopy_port'] or 22,
+            }
+
+        logging.getLogger('dbcopy').info("Start database copy: %s" % dbname)
+
+        time.sleep(6)
+        run('erpdbcopy -u %(user)s -p %(password)s -d %(dbname)s' % {
+            'user': CONFIG['db_user'] or '',
+            'password': CONFIG['db_password'] or '',
+            'dbname': dbname,
+            })
+        logging.getLogger('dbcopy').info("Finish database copy: %s" % dbname)
+
     def transition_createdb(self):
         dbname = Transaction().cursor.dbname
-        user = CONFIG['db_user'] or ''
-        password = CONFIG['db_password'] or ''
 
-        command = 'sudo bash -c "erpdbcopy -s %(server)s -u %(user)s -p %(password)s -d %(dbname)s -e trytond"' % {
-            'server': dbname,
-            'dbname': dbname,
-            'user': user,
-            'password': password,
-        }
-        os.system(command)
+        thread1 = threading.Thread(target=self.dbcopy, args=(dbname,))
+        thread1.start()
         return 'result'
 
     def default_result(self, fields):

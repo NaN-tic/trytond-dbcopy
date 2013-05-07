@@ -17,3 +17,9 @@ y conectarse a la nueva base de datos de copia.
 
 Este módulo usa el paquete de Python ERP DB Copia https://pypi.python.org/pypi/erpdbcopy
 lo que permite realizar copias de seguridad también a nivel de sistema operativo.
+
+Deberá añadir nuevas parámetros en el fichero tryton.cfg:
+
+* erpdbcopy_user: usuario del servidor. Defecto: root
+* erpdbcopy_server: Dominio or IP del servidor. Defecto: localhost
+* erpdbcopy_port: Puerto del servidor. Defecto: 22
