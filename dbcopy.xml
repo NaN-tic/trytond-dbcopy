@@ -12,13 +12,9 @@ The COPYRIGHT file at the top level of this repository contains the full copyrig
             <field name="arch" type="xml">
                 <![CDATA[
                 <form string="DB Copy">
-                    <group col="2" colspan="2" id="info">
-                        <label string="Clone a production database to test it. This action need restart Tryton Server. Try to connect later." id="clone" yalign="0.0" xalign="0.0" xexpand="1"/>
-                        <newline/>
-                        <label string="Attention: Only you can clone a database if is equal to Tryton name server." id="alert" yalign="0.0" xalign="0.0" xexpand="1"/>
-                    </group>
                     <label name="name"/>
                     <field name="name"/>
+                    <label string="Clone a production database to test it. This action need some time to generate a new database. Try to connect later." id="clone" yalign="0.0" xalign="0.0" xexpand="1"/>
                 </form>
                 ]]>
             </field>
