@@ -14,7 +14,7 @@ try:
     from fabric.api import env, run
     from fabric.tasks import execute
 except ImportError:
-    message = 'Unable to find ERP DB Copy Package'
+    message = 'Install Fabric package: pip install Fabric'
     logging.getLogger('dbcopy').error(message)
     raise Exception(message)
 
