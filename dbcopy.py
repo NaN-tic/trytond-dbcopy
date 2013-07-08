@@ -30,7 +30,7 @@ class CreateDbStart(ModelView):
     @staticmethod
     def default_name():
         dbname = Transaction().cursor.dbname
-        return "%s_copia" % dbname
+        return "%s_test" % dbname
 
 
 class CreateDbResult(ModelView):
