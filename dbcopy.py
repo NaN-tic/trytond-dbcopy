@@ -12,7 +12,6 @@ import time
 
 try:
     from fabric.api import env, run
-    from fabric.tasks import execute
 except ImportError:
     message = 'Install Fabric package: pip install Fabric'
     logging.getLogger('dbcopy').error(message)
