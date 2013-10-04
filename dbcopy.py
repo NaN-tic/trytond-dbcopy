@@ -5,7 +5,7 @@ from trytond.model import ModelView, fields
 from trytond.transaction import Transaction
 from trytond.wizard import Wizard, StateView, StateTransition, Button
 from trytond.config import CONFIG
-import os
+
 import logging
 import threading
 import time
