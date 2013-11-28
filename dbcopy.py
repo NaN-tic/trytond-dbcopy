@@ -63,7 +63,7 @@ class CreateDb(Wizard):
         logging.getLogger('dbcopy').info("Start database copy: %s" % dbname)
 
         time.sleep(6)
-        run('erpdbcopy -u %(user)s -p %(password)s -d %(dbname)s' % {
+        run('python /usr/local/bin/erpdbcopy -u %(user)s -p %(password)s -d %(dbname)s' % {
             'user': CONFIG['db_user'] or '',
             'password': CONFIG['db_password'] or '',
             'dbname': dbname,
