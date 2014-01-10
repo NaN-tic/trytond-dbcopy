@@ -4,12 +4,14 @@
 
 from trytond.pool import Pool
 from .dbcopy import *
+from .user import *
 
 
 def register():
     Pool.register(
         CreateDbStart,
         CreateDbResult,
+        User,
         module='dbcopy', type_='model')
     Pool.register(
         CreateDb,
