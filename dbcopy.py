@@ -55,17 +55,17 @@ class CreateDb(Wizard):
     @staticmethod
     def dbcopy(dbname):
         env.host_string = "%(user)s@%(server)s:%(port)s" % {
-            'user': CONFIG['erpdbcopy_user'] or 'root',
-            'server': CONFIG['erpdbcopy_server'] or 'localhost',
-            'port': CONFIG['erpdbcopy_port'] or 22,
+            'user': CONFIG.get('erpdbcopy_user', 'root'),
+            'server': CONFIG.get('erpdbcopy_server', 'localhost'),
+            'port': CONFIG.get('erpdbcopy_port', 22),
             }
 
         logging.getLogger('dbcopy').info("Start database copy: %s" % dbname)
 
         time.sleep(6)
         run('python /usr/local/bin/erpdbcopy -u %(user)s -p %(password)s -d %(dbname)s' % {
-            'user': CONFIG['db_user'] or '',
-            'password': CONFIG['db_password'] or '',
+            'user': CONFIG.get('db_user', ''),
+            'password': CONFIG.get('db_password', ''),
             'dbname': dbname,
             })
         logging.getLogger('dbcopy').info("Finish database copy: %s" % dbname)
