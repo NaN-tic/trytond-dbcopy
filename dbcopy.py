@@ -64,7 +64,7 @@ class CreateDb(Wizard):
 
         time.sleep(6)
         run('python /usr/local/bin/erpdbcopy -u %(user)s -p %(password)s -d %(dbname)s' % {
-            'user': CONFIG.get('db_user', ''),
+            'user': CONFIG.get('db_user', '') + '_test',
             'password': CONFIG.get('db_password', ''),
             'dbname': dbname,
             })
