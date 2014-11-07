@@ -1,10 +1,10 @@
-#This file is part dbcopy module for Tryton.
-#The COPYRIGHT file at the top level of this repository contains
-#the full copyright notices and license terms.
+# This file is part dbcopy module for Tryton.
+# The COPYRIGHT file at the top level of this repository contains
+# the full copyright notices and license terms.
 from trytond.model import ModelView, fields
 from trytond.transaction import Transaction
 from trytond.wizard import Wizard, StateView, StateTransition, Button
-from trytond.config import CONFIG
+from trytond.config import config
 
 import logging
 import threading
@@ -55,17 +55,17 @@ class CreateDb(Wizard):
     @staticmethod
     def dbcopy(dbname):
         env.host_string = "%(user)s@%(server)s:%(port)s" % {
-            'user': CONFIG.get('erpdbcopy_user', 'root'),
-            'server': CONFIG.get('erpdbcopy_server', 'localhost'),
-            'port': CONFIG.get('erpdbcopy_port', 22),
+            'user': config.get('erpdbcopy_user', 'root'),
+            'server': config.get('erpdbcopy_server', 'localhost'),
+            'port': config.get('erpdbcopy_port', 22),
             }
 
         logging.getLogger('dbcopy').info("Start database copy: %s" % dbname)
 
         time.sleep(6)
         run('python /usr/local/bin/erpdbcopy -u %(user)s -p %(password)s -d %(dbname)s' % {
-            'user': CONFIG.get('db_user', '') + '_test',
-            'password': CONFIG.get('db_password', ''),
+            'user': config.get('db_user', '') + '_test',
+            'password': config.get('db_password', ''),
             'dbname': dbname,
             })
         logging.getLogger('dbcopy').info("Finish database copy: %s" % dbname)
