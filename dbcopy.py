@@ -55,9 +55,9 @@ class CreateDb(Wizard):
     @staticmethod
     def dbcopy(dbname):
         env.host_string = "%(user)s@%(server)s:%(port)s" % {
-            'user': config.get('erpdbcopy', 'user'),
-            'server': config.get('erpdbcopy', 'server'),
-            'port': config.get('erpdbcopy', 'port'),
+            'user': config.get('erpdbcopy', 'user', 'root'),
+            'server': config.get('erpdbcopy', 'server', 'localhost'),
+            'port': config.get('erpdbcopy', 'port', 22),
             }
 
         logging.getLogger('dbcopy').info("Start database copy: %s" % dbname)
