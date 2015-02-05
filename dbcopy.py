@@ -64,7 +64,7 @@ class CreateDb(Wizard):
                     })
 
         database = config.get('database', 'uri')
-        db_user = database.split('/')[2].split(':')[0] + '_test'
+        db_user = database.split('/')[2].split(':')[0]
         db_password = database.split(':')[2].split('@')[0]
         db_server = database.split(':')[2].split('@')[1]
 
