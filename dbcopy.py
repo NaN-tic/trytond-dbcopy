@@ -1,6 +1,7 @@
 # This file is part dbcopy module for Tryton.
 # The COPYRIGHT file at the top level of this repository contains
 # the full copyright notices and license terms.
+from subprocess import Popen, PIPE
 from trytond.model import ModelView, fields
 from trytond.transaction import Transaction
 from trytond.wizard import Wizard, StateView, StateTransition, Button
@@ -52,23 +53,40 @@ class CreateDb(Wizard):
             Button('Close', 'end', 'tryton-close'),
             ])
 
-    @staticmethod
-    def dbcopy(dbname):
-        env.host_string = "%(user)s@%(server)s:%(port)s" % {
-            'user': config.get('erpdbcopy', 'user', 'root'),
-            'server': config.get('erpdbcopy', 'server', 'localhost'),
-            'port': config.get('erpdbcopy', 'port', 22),
-            }
+    def dbcopy(self, dbname):
 
-        logging.getLogger('dbcopy').info("Start database copy: %s" % dbname)
+        def erp_command(db_user, db_password, dbname):
+            return ('python /usr/local/bin/erpdbcopy -u %(user)s '
+                '-p %(password)s -d %(dbname)s' % {
+                    'user': db_user,
+                    'password': db_password,
+                    'dbname': dbname,
+                    })
 
         database = config.get('database', 'uri')
-        time.sleep(6)
-        run('python /usr/local/bin/erpdbcopy -u %(user)s -p %(password)s -d %(dbname)s' % {
-            'user': database.split('/')[2].split(':')[0] + '_test',
-            'password': database.split(':')[2].split('@')[0],
-            'dbname': dbname,
-            })
+        db_user = database.split('/')[2].split(':')[0] + '_test'
+        db_password = database.split(':')[2].split('@')[0]
+        db_server = database.split(':')[2].split('@')[1]
+
+        logging.getLogger('dbcopy').info("Start database copy: %s" % dbname)
+        if db_server != 'localhost':
+            user = config.get('erpdbcopy', 'user', 'root')
+            port = config.get('erpdbcopy', 'port', 22)
+            env.host_string = "%(user)s@%(server)s:%(port)s" % {
+                'user': user,
+                'server': db_server,
+                'port': port,
+                }
+            time.sleep(6)
+            run(erp_command(db_user, db_password, dbname))
+        else:
+            command = erp_command(db_user, db_password, dbname)
+            proccess = Popen(command, shell=True, stderr=PIPE)
+            _, error = proccess.communicate()
+            if error:
+                logging.getLogger('dbcopy').error("Error making copy of %s: %s"
+                    % (dbname, error))
+
         logging.getLogger('dbcopy').info("Finish database copy: %s" % dbname)
 
     def transition_createdb(self):
