@@ -6,7 +6,6 @@ from trytond.model import ModelView, fields
 from trytond.transaction import Transaction
 from trytond.wizard import Wizard, StateView, StateTransition, Button
 from trytond.config import config
-
 import logging
 import threading
 import time
@@ -14,8 +13,9 @@ import time
 try:
     from fabric.api import env, run
 except ImportError:
+    logger = logging.getLogger(__name__)
     message = 'Install Fabric package: pip install Fabric'
-    logging.getLogger('dbcopy').error(message)
+    logger.error(message)
     raise Exception(message)
 
 __all__ = ['CreateDbStart', 'CreateDbResult', 'CreateDb']
@@ -68,7 +68,7 @@ class CreateDb(Wizard):
         db_password = database.split(':')[2].split('@')[0]
         db_server = database.split(':')[2].split('@')[1]
 
-        logging.getLogger('dbcopy').info("Start database copy: %s" % dbname)
+        logger.info("Start database copy: %s" % dbname)
         if db_server != 'localhost':
             user = config.get('erpdbcopy', 'user', 'root')
             port = config.get('erpdbcopy', 'port', 22)
@@ -84,10 +84,10 @@ class CreateDb(Wizard):
             proccess = Popen(command, shell=True, stderr=PIPE)
             _, error = proccess.communicate()
             if error:
-                logging.getLogger('dbcopy').error("Error making copy of %s: %s"
+                logger.error("Error making copy of %s: %s"
                     % (dbname, error))
 
-        logging.getLogger('dbcopy').info("Finish database copy: %s" % dbname)
+        logger.info("Finish database copy: %s" % dbname)
 
     def transition_createdb(self):
         dbname = Transaction().cursor.dbname
