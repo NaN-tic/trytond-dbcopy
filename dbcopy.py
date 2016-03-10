@@ -29,7 +29,7 @@ class CreateDbStart(ModelView):
 
     @staticmethod
     def default_name():
-        dbname = Transaction().cursor.dbname
+        dbname = Transaction().database.name
         return "%s_test" % dbname
 
 
@@ -90,7 +90,7 @@ class CreateDb(Wizard):
         logger.info("Finish database copy: %s" % dbname)
 
     def transition_createdb(self):
-        dbname = Transaction().cursor.dbname
+        dbname = Transaction().database.name
 
         thread1 = threading.Thread(target=self.dbcopy, args=(dbname,))
         thread1.start()

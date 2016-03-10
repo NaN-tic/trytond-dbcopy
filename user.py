@@ -13,5 +13,5 @@ class User:
 
     def get_status_bar(self, name):
         status = super(User, self).get_status_bar(name)
-        status += ' - DB: %s' % (Transaction().cursor.dbname)
+        status += ' - DB: %s' % (Transaction().database.name)
         return status
