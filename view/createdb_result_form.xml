@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<!-- This file is part of dbcopy module for Tryton.
+The COPYRIGHT file at the top level of this repository contains the full
+copyright notices and license terms. -->
+<form string="DB Copy">
+    <label string="Tryton Server has started to clone Database. Try to connect later." id="process" yalign="0.0" xalign="0.0" xexpand="1"/>
+</form>

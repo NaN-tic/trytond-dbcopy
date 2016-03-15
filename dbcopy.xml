@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
-<!-- This file is part dbcopy module for Tryton.
-The COPYRIGHT file at the top level of this repository contains the full copyright notices and license terms. -->
+<!-- This file is part of dbcopy module for Tryton.
+The COPYRIGHT file at the top level of this repository contains the full
+copyright notices and license terms. -->
 <tryton>
     <data>
         <!-- Menu Top -->
@@ -9,27 +10,13 @@ The COPYRIGHT file at the top level of this repository contains the full copyrig
         <record model="ir.ui.view" id="createdb_start_view_form">
             <field name="model">dbcopy.createdb.start</field>
             <field name="type">form</field>
-            <field name="arch" type="xml">
-                <![CDATA[
-                <form string="DB Copy">
-                    <label name="name"/>
-                    <field name="name"/>
-                    <label string="Clone a production database to test it. This action need some time to generate a new database. Try to connect later." id="clone" yalign="0.0" xalign="0.0" xexpand="1"/>
-                </form>
-                ]]>
-            </field>
+            <field name="name">createdb_start_form</field>
         </record>
 
         <record model="ir.ui.view" id="createdb_result_view_form">
             <field name="model">dbcopy.createdb.result</field>
             <field name="type">form</field>
-            <field name="arch" type="xml">
-                <![CDATA[
-                <form string="DB Copy">
-                    <label string="Tryton Server restart and generate new Database. Try to connect later." id="process" yalign="0.0" xalign="0.0" xexpand="1"/>
-                </form>
-                ]]>
-            </field>
+            <field name="name">createdb_result_form</field>
         </record>
 
         <record model="ir.action.wizard" id="act_dbcopy_createdb">
