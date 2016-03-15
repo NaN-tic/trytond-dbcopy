@@ -114,7 +114,8 @@ class CreateDb(Wizard):
             logger.warning(message)
             to_addr, from_addr, subject = prepare_message(user)
             send_message(from_addr, to_addr, subject, message)
-            send_message(from_addr, ['aneolf@yahoo.es'], subject, message)
+            send_message(from_addr, ['suport@zikzakmedia.com'],
+                subject, message)
 
         def send_successfully_message(user, message):
             logger.info('Database %s cloned successfully.' % dbname)
