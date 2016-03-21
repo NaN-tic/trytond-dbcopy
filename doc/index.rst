@@ -6,6 +6,14 @@ _test is available to test in test enviroment.
 
 Add new params in tryton.cfg server options:
 
-* erpdbcopy_user: user server. Default: root
-* erpdbcopy_server: Domain or IP server. Default: localhost
-* erpdbcopy_port: Port server. Default: 22
+Configuration
+=============
+
+To receive e-mail is necessary to add an email address to the user that
+performs the copy: Menu Administration> Users> Users.
+
+Warning
+=======
+
+It is strongly recommended *not* to clone the database when other people are
+working on the ERP because this process stops any action they were performing.

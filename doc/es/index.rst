@@ -15,11 +15,20 @@ misma, se reiniciará el servidor Tryton y se perderá el acceso al mismo.
 Una vez creada esta nueva base de datos se podrá abrir un nuevo cliente Tryton
 y conectarse a la nueva base de datos de copia.
 
-Este módulo usa el paquete de Python ERP DB Copia https://pypi.python.org/pypi/erpdbcopy
-lo que permite realizar copias de seguridad también a nivel de sistema operativo.
+Una vez realizada la copia, se envía un correo electrónico al usuario
+informando del resultado de la clonación. En caso de fallo también se le envía
+al proveedor de los servicios TIC.
 
-Deberá añadir nuevas parámetros en el fichero tryton.cfg:
+Configuración
+=============
 
-* erpdbcopy_user: usuario del servidor. Defecto: root
-* erpdbcopy_server: Dominio or IP del servidor. Defecto: localhost
-* erpdbcopy_port: Puerto del servidor. Defecto: 22
+Para recibir el correo electrónico es necesario añadir una dirección de correo
+electrónico al usuario que realice la copia: menú Administración > Usuarios >
+Usuarios.
+
+Precauciones
+============
+
+Se recomienda encarecidamente *no* realizar una copia de la base de datos
+cuando otras personas están trabajando en el ERP debido a que este proceso
+interrumpe cualquier acción que estuvieran realizando.
