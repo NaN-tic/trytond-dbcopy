@@ -3,8 +3,12 @@ msgid ""
 msgstr "Content-Type: text/plain; charset=utf-8\n"
 
 msgctxt "error:dbcopy.createdb:"
-msgid "Database %s cloned successfully."
-msgstr "Base de datos %s clonada con éxito."
+msgid ""
+"Database %s cloned successfully.\n"
+"Now you can connect to the new database."
+msgstr ""
+"Base de datos %s clonada con éxito.\n"
+"Ahora puede conectarse a la nueva base de datos."
 
 msgctxt "error:dbcopy.createdb:"
 msgid "Error cloning database %s."
@@ -15,12 +19,30 @@ msgid "Error closing database %s connections."
 msgstr "Error cerrando las conexiones de la base de datos %s."
 
 msgctxt "error:dbcopy.createdb:"
+msgid "Error creating database %s."
+msgstr "Error creando la base de datos %s."
+
+msgctxt "error:dbcopy.createdb:"
+msgid "Error deactivating crons.\\nPlease, deactivate them manually."
+msgstr ""
+"Error desactivando las acciones planificadas.\\nPor favor, desactivelas "
+"manualmente."
+
+msgctxt "error:dbcopy.createdb:"
 msgid "Error dropping database %s."
 msgstr "Error borrando la base de datos %s."
 
 msgctxt "error:dbcopy.createdb:"
+msgid "Error restoring database %s."
+msgstr "Error restaurando la base de datos %s."
+
+msgctxt "error:dbcopy.createdb:"
 msgid "Tryton dbcopy result of clone database %s"
 msgstr "Resultado de Trytond dbcopy de clonación de la base de datos %s"
+
+msgctxt "error:dbcopy.createdb:"
+msgid "User %s has not got any email address."
+msgstr "El usuario %s no tiene ninguna dirección de correo electrónico."
 
 msgctxt "error:dbcopy.createdb:"
 msgid "You cannot make a database clone of test."

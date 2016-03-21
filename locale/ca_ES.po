@@ -3,8 +3,12 @@ msgid ""
 msgstr "Content-Type: text/plain; charset=utf-8\n"
 
 msgctxt "error:dbcopy.createdb:"
-msgid "Database %s cloned successfully."
-msgstr "Base de dades %s clonada amb éxit."
+msgid ""
+"Database %s cloned successfully.\n"
+"Now you can connect to the new database."
+msgstr ""
+"La base de dades %s s'ha clonat amb éxit.\n"
+"Ara podeu connectar-vos a la nova base de dades."
 
 msgctxt "error:dbcopy.createdb:"
 msgid "Error cloning database %s."
@@ -15,12 +19,30 @@ msgid "Error closing database %s connections."
 msgstr "Error tancant les connexions de la base de dades %s."
 
 msgctxt "error:dbcopy.createdb:"
+msgid "Error creating database %s."
+msgstr "Error creant la base de dades %s."
+
+msgctxt "error:dbcopy.createdb:"
+msgid "Error deactivating crons.\\nPlease, deactivate them manually."
+msgstr ""
+"Error desactivant les accions planificades.\\nSi us plau, desactiveu-les "
+"manualment."
+
+msgctxt "error:dbcopy.createdb:"
 msgid "Error dropping database %s."
 msgstr "Error esborrant la base de dades %s."
 
 msgctxt "error:dbcopy.createdb:"
+msgid "Error restoring database %s."
+msgstr "Error restaurant la base de dades %s."
+
+msgctxt "error:dbcopy.createdb:"
 msgid "Tryton dbcopy result of clone database %s"
 msgstr "Resultat de Trytond dbcopy de clonació de base de dades %s"
+
+msgctxt "error:dbcopy.createdb:"
+msgid "User %s has not got any email address."
+msgstr "L'usuari %s no té cap adreça de correu electrònic."
 
 msgctxt "error:dbcopy.createdb:"
 msgid "You cannot make a database clone of test."
