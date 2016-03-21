@@ -1,10 +1,38 @@
-# 
+#
 msgid ""
 msgstr "Content-Type: text/plain; charset=utf-8\n"
+
+msgctxt "error:dbcopy.createdb:"
+msgid "Database %s cloned successfully."
+msgstr "Base de dades %s clonada amb éxit."
+
+msgctxt "error:dbcopy.createdb:"
+msgid "Error cloning database %s."
+msgstr "Error clonat la base de dades %s."
+
+msgctxt "error:dbcopy.createdb:"
+msgid "Error closing database %s connections."
+msgstr "Error tancant les connexions de la base de dades %s."
+
+msgctxt "error:dbcopy.createdb:"
+msgid "Error dropping database %s."
+msgstr "Error esborrant la base de dades %s."
+
+msgctxt "error:dbcopy.createdb:"
+msgid "Tryton dbcopy result of clone database %s"
+msgstr "Resultat de Trytond dbcopy de clonació de base de dades %s"
+
+msgctxt "error:dbcopy.createdb:"
+msgid "You cannot make a database clone of test."
+msgstr "No podeu fer una clonació de la base de dades de test."
 
 msgctxt "field:dbcopy.createdb.result,id:"
 msgid "ID"
 msgstr "ID"
+
+msgctxt "field:dbcopy.createdb.result,name:"
+msgid "DB Name"
+msgstr "Nom base de dades"
 
 msgctxt "field:dbcopy.createdb.start,id:"
 msgid "ID"
@@ -39,22 +67,33 @@ msgid "DB Copy"
 msgstr "Copia base de dades"
 
 msgctxt "view:dbcopy.createdb.result:"
-msgid "Tryton Server restart and generate new Database. Try to connect later."
+msgid "Tryton Server has started to clone Database. Try to connect later."
 msgstr ""
-"El servidor de Tryton es reneicia per generar una base de dades nova. "
-"Intenta connectar mes tard."
-
-msgctxt "view:dbcopy.createdb.start:"
-msgid ""
-"Clone a production database to test it. This action need some time to "
-"generate a new database. Try to connect later."
-msgstr ""
-"Clona una base de dades en producció per a test. Aquesta acció necessita un "
-"temps per generar-se. Intenta connectar mes tard."
+"El servidor Tryton ha començat a clonar la base de dades. Intenti connectar-"
+"se més tard."
 
 msgctxt "view:dbcopy.createdb.start:"
 msgid "DB Copy"
 msgstr "Copia base de dades"
+
+msgctxt "view:dbcopy.createdb.start:"
+msgid ""
+"It clones a production database to test. This action need some time to "
+"generate the database so, try to connect later."
+msgstr ""
+"Clona la base de dades de producció per testeig. Aquesta acció necessita "
+"cert temps per generar la base de dades, per tant, intenti connectar més "
+"tard."
+
+msgctxt "view:dbcopy.createdb.start:"
+msgid ""
+"Warning! It is strongly recommended not to clone the database when other "
+"people are working on the ERP because this process stops any action they "
+"were performing."
+msgstr ""
+"Atenció! Es recomana encaridament no clonar la base de dades quan altres "
+"persones estan treballant a l'ERP perque aquest procés atura qualsevol acció"
+" que estiguessin realitzant."
 
 msgctxt "wizard_button:dbcopy.createdb,result,end:"
 msgid "Close"
