@@ -5,10 +5,10 @@ from trytond.pool import PoolMeta
 from trytond.transaction import Transaction
 
 __all__ = ['User']
-__metaclass__ = PoolMeta
 
 
 class User:
+    __metaclass__ = PoolMeta
     __name__ = "res.user"
 
     def get_status_bar(self, name):
