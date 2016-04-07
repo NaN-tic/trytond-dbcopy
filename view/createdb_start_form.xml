@@ -2,10 +2,13 @@
 <!-- This file is part of dbcopy module for Tryton.
 The COPYRIGHT file at the top level of this repository contains the full
 copyright notices and license terms. -->
-<form string="DB Copy">
+<form string="DB Copy" col="4">
+    <label string="It clones a production database to test. This action need some time to generate the database so, try to connect later." id="clone" yalign="0.0" xalign="0.0" xexpand="0" colspan="4"/>
+    <newline/>
+    <label string="Warning! It is strongly recommended not to clone the database when other people are working on the ERP because this process stops any action they were performing." id="warning" yalign="0.0" xalign="0.0" xexpand="0" colspan="4"/>
+    <newline/>
     <label name="name"/>
     <field name="name"/>
-    <label string="It clones a production database to test. This action need some time to generate the database so, try to connect later." id="clone" yalign="0.0" xalign="0.0" xexpand="1"/>
-    <newline/>
-    <label string="Warning! It is strongly recommended not to clone the database when other people are working on the ERP because this process stops any action they were performing." id="warning" yalign="0.0" xalign="0.0" xexpand="1" colspan="4"/>
+    <label name="super_pwd"/>
+    <field name="super_pwd" widget="password"/>
 </form>
