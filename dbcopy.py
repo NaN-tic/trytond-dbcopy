@@ -142,7 +142,7 @@ class CreateDb(Wizard):
                 to_addr, from_addr, subject = prepare_message(user)
                 send_message(from_addr, [to_addr], subject, message)
 
-        def execute_command(command):
+        def execute_command(command, dbname):
             uri = parse_uri(config.get('database', 'uri'))
             env = environ.copy()
 
@@ -154,7 +154,8 @@ class CreateDb(Wizard):
                 command.append('--port=' + str(uri.port))
             if uri.password:
                 env['PGPASSWORD'] = uri.password
-
+            command.append(dbname)
+        
             process = Popen(command, env=env, stdout=PIPE, stderr=PIPE)
             return process.communicate()
 
@@ -173,19 +174,13 @@ class CreateDb(Wizard):
 
         def dump_db(dbname):
             tmp_file = get_tmp_file_name(dbname)
-            command = ['pg_dump', '-d', dbname, '-f', tmp_file]
-            return execute_command(command)
+            command = ['pg_dump', '-f', tmp_file]
+            return execute_command(command, dbname)
 
         def drop_db_test(dbname):
-            uri = parse_uri(config.get('database', 'uri'))
-            env = environ.copy()
+            command = ['dropdb', '-w']
+            return execute_command(command, dbname + '_test')
 
-            if uri.password:
-                env['PGPASSWORD'] = uri.password
-
-            command = ['dropdb', '-w', '-U', uri.username, dbname + '_test']
-            process = Popen(command, env=env, stdout=PIPE, stderr=PIPE)
-            return process.communicate()
 
         def force_drop_db_test(dbname):
             pg_stat_activity = Table('pg_stat_activity')
@@ -201,22 +196,22 @@ class CreateDb(Wizard):
                     )
                 )
             query = tuple(query)[0] % query.params
-            command = ['psql', '-d', dbname + '_test',  '-c', query]
-            output, error = execute_command(command)
+            command = ['psql', '-c', query]
+            output, error = execute_command(command, dbname + '_test')
             for proc_id in output.split('\n'):
                 try:
                     pid = int(proc_id)
                 except:
                     continue
                 query = 'SELECT pg_cancel_backend(%s)' % pid
-                command = ['psql', '-d', dbname + '_test', '-c', query]
-                _, error = execute_command(command)
+                command = ['psql', '-c', query]
+                _, error = execute_command(command, dbname + '_test')
                 if error:
                     return _, error
 
                 query = 'SELECT pg_terminate_backend(%s)' % pid
-                command = ['psql', '-d', dbname + '_test', '-c', query]
-                _, error = execute_command(command)
+                command = ['psql', '-c', query]
+                _, error = execute_command(command, dbname + '_test')
                 if error:
                     return _, error
 
@@ -224,25 +219,27 @@ class CreateDb(Wizard):
 
         def create_db_test(dbname):
             uri = parse_uri(config.get('database', 'uri'))
-            command = ['createdb', dbname + '_test', '-O', uri.username, '-T', 'template0']
-            return execute_command(command)
+            command = ['createdb', '-O', uri.username, '-T', 'template0']
+            return execute_command(command, dbname + '_test')
 
         def restore_db_test(dbname,):
             tmp_file = get_tmp_file_name(dbname)
-            command = ['psql', '-q', '-f', tmp_file, '-d', dbname + '_test']
-            return execute_command(command)
+            command = ['psql', '-q', '-f', tmp_file]
+            return execute_command(command, dbname + '_test')
 
         def deactivate_crons(dbname):
             cron = Table('ir_cron')
             query = cron.update([cron.active], [False])
             query = tuple(query)[0] % query.params
-            command = ['psql', '-d', dbname +'_test', '-c', query]
-            return execute_command(command)
+            command = ['psql', '-c', query]
+            return execute_command(command, dbname + '_test')
 
         def rm_dump(dbname):
+            env = {}
             tmp_file = get_tmp_file_name(dbname)
             command = ['rm', tmp_file]
-            return execute_command(command)
+            process = Popen(command, env=env, stdout=PIPE, stderr=PIPE)
+            return process.communicate()
 
         # dump db
         _, error = dump_db(dbname)
