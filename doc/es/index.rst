@@ -7,7 +7,10 @@ con finalidades de test o pruebas. Por ejemplo, si el usuario desea realizar un
 cierre contable, pero antes desea hacerlo en un entorno de pruebas, puede usar
 esta nueva base de datos para hacer el test.
 
-Para la creación de la nueva base de datos hay que acceder a Administración.
+Para la creación de la nueva base de datos hay que acceder a Administración/Copia
+base de datos. Os pedirá la contraseña del Servidor de Tryton (está contraseña
+no es la del usuario o usuario "admin", si no del servidor). En el caso que no use la
+contraseña correcta, os mostrará el mensaje de "Acceso denegado" (Access Denied).
 
 El asistente mostrará algunas advertencias como que durante la generación de la
 misma, se reiniciará el servidor Tryton y se perderá el acceso al mismo.
@@ -23,8 +26,7 @@ Configuración
 =============
 
 Para recibir el correo electrónico es necesario añadir una dirección de correo
-electrónico al usuario que realice la copia: menú Administración > Usuarios >
-Usuarios.
+electrónico al usuario que realice la copia (en sus preferencias).
 
 Precauciones
 ============
