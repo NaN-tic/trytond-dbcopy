@@ -10,7 +10,7 @@ from trytond import security
 from trytond.config import config, parse_uri
 from trytond.model import ModelView, fields
 from trytond.pool import Pool
-from trytond.tools import get_smtp_server
+from trytond.sendmail import sendmail
 from trytond.transaction import Transaction
 from trytond.wizard import Wizard, StateView, StateTransition, Button
 import logging
@@ -107,23 +107,21 @@ class CreateDb(Wizard):
             if not to_addr:
                 cls.raise_user_error('user_email_error', user.name)
             from_addr = config.get('email', 'from')
+
             subject = cls.raise_user_error('email_subject', (dbname,),
                 raise_exception=False)
             return to_addr, from_addr, subject
 
-        def send_message(from_addr, to_addr, subject, body):
+        def create_message(from_addr, to_addrs, subject, body):
             msg = MIMEText(body, _charset='utf-8')
-            msg['To'] = ', '.join(to_addr)
+            msg['To'] = ', '.join(to_addrs)
             msg['From'] = from_addr
             msg['Subject'] = Header(subject, 'utf-8')
-            try:
-                server = get_smtp_server()
-                server.sendmail(from_addr, ', '.join(to_addr), msg.as_string())
-                server.quit()
-                logger.info('eMail delivered to %s ' % msg['To'])
-            except Exception, exception:
-                logger.warning('Unable to deliver email (%s):\n %s'
-                    % (exception, msg.as_string()))
+            return msg
+
+        def send_message(from_addr, to_addrs, subject, body):
+            msg = create_message(from_addr, to_addrs, subject, body)
+            sendmail(from_addr, to_addrs, msg)
 
         def send_error_message(user, message, error):
             with Transaction().start(dbname, user):
@@ -165,11 +163,11 @@ class CreateDb(Wizard):
 
         def db_exist(dbname):
             Database = backend.get('Database')
-            database = Database().connect()
-            cursor = database.cursor()
-            databases = database.list(cursor)
-            cursor.close()
-            return dbname + '_test' in databases
+            try:
+                Database(dbname + '_test').connect()
+                return True
+            except Exception:
+                return False
 
         def dump_db(dbname):
             tmp_file = get_tmp_file_name(dbname)
