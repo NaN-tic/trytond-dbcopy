@@ -128,8 +128,8 @@ class CreateDb(Wizard):
         def send_error_message(user, message, error):
             with Transaction().start(dbname, user):
                 message = cls.raise_user_error(message, (dbname,),
-                    raise_exception=False)
-                message += '\n\n'+ error
+                    raise_exception=False).decode("ascii", "replace")
+                message += '\n\n'+ error.decode("ascii", "replace")
                 logger.warning(message)
                 to_addr, from_addr, subject = prepare_message(user)
                 send_message(from_addr, [to_addr], subject, message)
