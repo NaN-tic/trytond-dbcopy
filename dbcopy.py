@@ -29,7 +29,6 @@ class CreateDbStart(ModelView):
     'Create DB Copy'
     __name__ = 'dbcopy.createdb.start'
     name = fields.Char('DB Name', readonly=True)
-    super_pwd = fields.Char('Super Password', required=True)
 
     @staticmethod
     def default_name():
@@ -83,9 +82,6 @@ class CreateDb(Wizard):
         if dbname.endswith('_test'):
             self.raise_user_error('dbname_error')
         user = transaction.user
-        super_pwd = self.start.super_pwd
-
-        security.check_super(super_pwd)
 
         uri = parse_uri(config.get('database', 'uri'))
         if not uri.scheme == 'postgresql':
@@ -153,7 +149,7 @@ class CreateDb(Wizard):
             if uri.password:
                 env['PGPASSWORD'] = uri.password
             command.append(dbname)
-        
+
             process = Popen(command, env=env, stdout=PIPE, stderr=PIPE)
             return process.communicate()
 
