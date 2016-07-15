@@ -9,6 +9,4 @@ copyright notices and license terms. -->
     <newline/>
     <label name="name"/>
     <field name="name"/>
-    <label name="super_pwd"/>
-    <field name="super_pwd" widget="password"/>
 </form>
