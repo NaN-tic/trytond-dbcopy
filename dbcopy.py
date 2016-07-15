@@ -190,9 +190,9 @@ class CreateDb(Wizard):
             cursor.close()
             return database in databases
 
-        def dump_db(database, path):
+        def dump_db(database, path, username=None, password=None):
             command = ['pg_dump', '-f', path]
-            return execute_command(command, database)
+            return execute_command(command, database, username, password)
 
         def drop_db(database, username, password):
             command = ['dropdb', '-w']
@@ -263,7 +263,8 @@ class CreateDb(Wizard):
                         path))
                 _, error = dump_db(target_database, os.path.join(path,
                         '%s-%s.sql' % (target_database,
-                            datetime.now().strftime('%Y-%m-%d_%H:%M:%S'))))
+                            datetime.now().strftime('%Y-%m-%d_%H:%M:%S'))),
+                    target_username, target_password)
                 if error:
                     send_error_message(user, 'dumping_db_error', error)
                     return
