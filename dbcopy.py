@@ -30,6 +30,7 @@ class CreateDbStart(ModelView):
     __name__ = 'dbcopy.createdb.start'
     database = fields.Char('Database Name')
     username = fields.Char('Database User')
+    password = fields.Char('Database Password')
 
     @staticmethod
     def default_database():
@@ -108,13 +109,13 @@ class CreateDb(Wizard):
         thread = threading.Thread(
                 target=self.createdb_thread,
                 args=(user, transaction.cursor.dbname, self.start.database,
-                self.start.username), kwargs={})
+                self.start.username, self.start.password), kwargs={})
         thread.start()
         return 'result'
 
     @classmethod
     def createdb_thread(cls, user, source_database, target_database,
-            target_username):
+            target_username, target_password):
 
         def prepare_message(user):
             user = Pool().get('res.user')(user)
@@ -186,15 +187,15 @@ class CreateDb(Wizard):
             cursor.close()
             return database in databases
 
-        def dump_db(database, path):
+        def dump_db(database, path, password):
             command = ['pg_dump', '-f', path]
-            return execute_command(command, database)
+            return execute_command(command, database, password)
 
-        def drop_db(database, username):
+        def drop_db(database, username, password):
             command = ['dropdb', '-w']
-            return execute_command(command, database, username)
+            return execute_command(command, database, username, password)
 
-        def force_drop_db(database, username):
+        def force_drop_db(database, username, password):
             pg_stat_activity = Table('pg_stat_activity')
 
             uri = parse_uri(config.get('database', 'uri'))
@@ -209,7 +210,8 @@ class CreateDb(Wizard):
                 )
             query = tuple(query)[0] % query.params
             command = ['psql', '-c', query]
-            output, error = execute_command(command, database, username)
+            output, error = execute_command(command, database, username,
+                password)
             for proc_id in output.split('\n'):
                 try:
                     pid = int(proc_id)
@@ -217,27 +219,29 @@ class CreateDb(Wizard):
                     continue
                 query = 'SELECT pg_cancel_backend(%s)' % pid
                 command = ['psql', '-c', query]
-                _, error = execute_command(command, database, username)
+                _, error = execute_command(command, database, username,
+                    password)
                 if error:
                     return _, error
 
                 query = 'SELECT pg_terminate_backend(%s)' % pid
                 command = ['psql', '-c', query]
-                _, error = execute_command(command, database, username)
+                _, error = execute_command(command, database, username,
+                    password)
                 if error:
                     return _, error
-            return drop_db(database, username)
+            return drop_db(database, username, password)
 
-        def create_db(database, username):
+        def create_db(database, username, password):
             command = ['createdb']
             if username:
                 command += ['-O', username]
             command += ['-T', 'template0']
-            return execute_command(command, database, username)
+            return execute_command(command, database, username, password)
 
-        def restore_db(path, database, username):
+        def restore_db(path, database, username, password):
             command = ['psql', '-q', '-f', path]
-            return execute_command(command, database, username)
+            return execute_command(command, database, username, password)
 
         def deactivate_crons(database):
             cron = Table('ir_cron')
@@ -249,15 +253,17 @@ class CreateDb(Wizard):
 
         # Drop target database
         if db_exists(target_database):
-            _, error = drop_db(target_database, target_username)
+            _, error = drop_db(target_database, target_username,
+                target_password)
             if error:
-                _, error = force_drop_db(target_database, target_username)
+                _, error = force_drop_db(target_database, target_username,
+                    target_password)
                 if error:
                     send_error_message(user, 'dropping_db_error', error)
                     return
 
         # Create target database
-        _, error = create_db(target_database, target_username)
+        _, error = create_db(target_database, target_username, target_password)
         if error:
             send_error_message(user, 'creating_db_error', error)
             return
@@ -271,7 +277,7 @@ class CreateDb(Wizard):
                 datetime.now().strftime('%Y-%m-%d_%H:%M:%S'))
         logger.info('Dumping database into %s' % path)
 
-        _, error = dump_db(source_database, path)
+        _, error = dump_db(source_database, path, target_password)
         if error:
             send_error_message(user, 'dumping_db_error', error)
             if temporary:
@@ -279,7 +285,8 @@ class CreateDb(Wizard):
             return
 
         # Restore into target database
-        _, error = restore_db(path, target_database, target_username)
+        _, error = restore_db(path, target_database, target_username,
+            target_password)
         if error:
             send_error_message(user, 'restoring_db_error', error)
             if temporary:
