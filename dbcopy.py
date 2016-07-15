@@ -176,6 +176,7 @@ class CreateDb(Wizard):
                 env['PGPASSWORD'] = password
             command.append(database)
 
+            print "EXECUTING: ", command, env
             process = Popen(command, env=env, stdout=PIPE, stderr=PIPE)
             return process.communicate()
 
@@ -201,38 +202,16 @@ class CreateDb(Wizard):
         def force_drop_db(database, username, password):
             pg_stat_activity = Table('pg_stat_activity')
 
-            uri = parse_uri(config.get('database', 'uri'))
-
-            query = pg_stat_activity.select(
-                pg_stat_activity.pid,
-                where=(
-                    (pg_stat_activity.usename == "'%s'" % uri.username) &
-                    (pg_stat_activity.datname == "'%s'" % database) &
-                    (Not(Like(pg_stat_activity.query, "'%pg_stat_activity%'")))
-                    )
-                )
-            query = tuple(query)[0] % query.params
-            command = ['psql', '-c', query]
-            output, error = execute_command(command, database, username,
-                password)
-            for proc_id in output.split('\n'):
-                try:
-                    pid = int(proc_id)
-                except:
-                    continue
+            Database = backend.get('Database')
+            cursor = Database().connect().cursor()
+            query = "SELECT pid FROM pg_stat_activity WHERE datname='%s'" % database
+            cursor.execute(query)
+            pids = [x[0] for x in cursor.fetchall()]
+            for pid in pids:
                 query = 'SELECT pg_cancel_backend(%s)' % pid
-                command = ['psql', '-c', query]
-                _, error = execute_command(command, database, username,
-                    password)
-                if error:
-                    return _, error
-
+                cursor.execute(query)
                 query = 'SELECT pg_terminate_backend(%s)' % pid
-                command = ['psql', '-c', query]
-                _, error = execute_command(command, database, username,
-                    password)
-                if error:
-                    return _, error
+                cursor.execute(query)
             return drop_db(database, username, password)
 
         def create_db(database, username, password):
@@ -271,6 +250,8 @@ class CreateDb(Wizard):
             _, error = drop_db(target_database, target_username,
                 target_password)
             if error:
+		logger.info('Could not drop database %s. Trying to force.' %
+                    target_database)
                 _, error = force_drop_db(target_database, target_username,
                     target_password)
                 if error:
