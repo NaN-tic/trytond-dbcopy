@@ -83,6 +83,9 @@ class CreateDb(Wizard):
                 'user_email_error': 'User %s has not got any email address.',
                 'connection_error': 'Error connection to new test database.\n'
                     'Please, create new test database or contact us.',
+                'cannot_overwrite': 'You cannot overwrite current database.',
+                'must_contain_test': ('To prevent removal of valid data, '
+                    'target database must contain "test" in its name.'),
                 })
 
     def transition_createdb(self):
@@ -92,9 +95,10 @@ class CreateDb(Wizard):
         if not to_addr:
             self.raise_user_error('user_email_error', user.name)
 
-        source_database = transaction.cursor.dbname
-        if source_database.endswith('_test'):
-            self.raise_user_error('dbname_error')
+        if self.start.database == transaction.cursor.dbname:
+            self.raise_user_error('cannot_overwrite')
+        if not 'test' in self.start.database:
+            self.raise_user_error('must_contain_test')
         user = transaction.user
 
         uri = parse_uri(config.get('database', 'uri'))
@@ -103,7 +107,7 @@ class CreateDb(Wizard):
 
         thread = threading.Thread(
                 target=self.createdb_thread,
-                args=(user, source_database, self.start.database,
+                args=(user, transaction.cursor.dbname, self.start.database,
                 self.start.username), kwargs={})
         thread.start()
         return 'result'
@@ -174,11 +178,14 @@ class CreateDb(Wizard):
             process = Popen(command, env=env, stdout=PIPE, stderr=PIPE)
             return process.communicate()
 
-        def db_exist(database):
+        def db_exists(database):
             Database = backend.get('Database')
-            database = Database().connect()
-            cursor = database.cursor()
-            databases = database.list(cursor)
+            cursor = Database().connect().cursor()
+
+            pg_database = Table('pg_database')
+            query = pg_database.select(pg_database.datname)
+            cursor.execute(*query)
+            databases = [x[0] for x in cursor.fetchall()]
             cursor.close()
             return database in databases
 
@@ -244,7 +251,7 @@ class CreateDb(Wizard):
 
 
         # Drop target database
-        if db_exist(target_database):
+        if db_exists(target_database):
             _, error = drop_db(target_database, target_username)
             if error:
                 _, error = force_drop_db(target_database, target_username)
