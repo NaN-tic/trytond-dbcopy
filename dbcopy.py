@@ -2,6 +2,7 @@
 # The COPYRIGHT file at the top level of this repository contains
 # the full copyright notices and license terms.
 import os
+from datetime import datetime
 from email.header import Header
 from email.mime.text import MIMEText
 from subprocess import Popen, PIPE
@@ -72,8 +73,9 @@ class CreateDb(Wizard):
                 'dbname_scheme': ('You database is not PSQL. Can not copy your '
                     'database'),
                 'email_subject': 'Tryton dbcopy result of clone database %s',
-                'db_cloned_successfully': 'Database %s cloned successfully.\n'
-                    'Now you can connect to the new database.',
+                'db_cloned_successfully': ('Database %(source)s cloned '
+                    'successfully into %(target)s.\nNow you can connect to the '
+                    'new database.'),
                 'dumping_db_error': 'Error dumping database %s.',
                 'dropping_db_error': 'Error dropping database %s.',
                 'creating_db_error': 'Error creating database %s.',
@@ -143,8 +145,10 @@ class CreateDb(Wizard):
 
         def send_successfully_message(user, message):
             with Transaction().start(source_database, user):
-                message = cls.raise_user_error(message, (source_database,),
-                    raise_exception=False)
+                message = cls.raise_user_error(message, {
+                        'source': source_database,
+                        'target': target_database,
+                        }, raise_exception=False)
                 logger.info('Database %s cloned successfully.' %
                     source_database)
                 to_addr, from_addr, subject = prepare_message(user)
@@ -236,14 +240,6 @@ class CreateDb(Wizard):
             return execute_command(command, database)
 
 
-        _, path = tempfile.mkstemp('.sql')
-
-        # Dump source database
-        _, error = dump_db(source_database, path)
-        if error:
-            send_error_message(user, 'dumping_db_error', error)
-            return
-
         # Drop target database
         if db_exist(target_database):
             _, error = drop_db(target_database, target_username)
@@ -259,20 +255,39 @@ class CreateDb(Wizard):
             send_error_message(user, 'creating_db_error', error)
             return
 
+        # Dump source database
+        temporary = False
+        path = config.get('dbcopy', 'path')
+        if not path:
+            temporary = True
+            _, path = tempfile.mkstemp('-%s.sql' %
+                datetime.now().strftime('%Y-%m-%d_%H:%M:%S'))
+        logger.info('Dumping database into %s' % path)
+
+        _, error = dump_db(source_database, path)
+        if error:
+            send_error_message(user, 'dumping_db_error', error)
+            if temporary:
+                os.remove(path)
+            return
+
         # Restore into target database
         _, error = restore_db(path, target_database, target_username)
         if error:
             send_error_message(user, 'restoring_db_error', error)
+            if temporary:
+                os.remove(path)
             return
+
+        # Remove dump file
+        if temporary:
+            os.remove(path)
 
         # Deactivate crons on target database
         _, error = deactivate_crons(target_database)
         if error:
             send_error_message(user, 'connection_error', error)
             return
-
-        # Remove dump file
-        os.remove(path)
 
         send_successfully_message(user, 'db_cloned_successfully')
 
