@@ -274,7 +274,10 @@ class CreateDb(Wizard):
         # Dump source database
         temporary = False
         path = config.get('dbcopy', 'path')
-        if not path:
+        if path:
+            path = os.path.join(path, '%s-%s.sql' % (source_database,
+                    datetime.now().strftime('%Y-%m-%d_%H:%M:%S')))
+        else:
             temporary = True
             _, path = tempfile.mkstemp('-%s.sql' %
                 datetime.now().strftime('%Y-%m-%d_%H:%M:%S'))
