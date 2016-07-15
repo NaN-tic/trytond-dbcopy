@@ -254,8 +254,19 @@ class CreateDb(Wizard):
             return execute_command(command, database)
 
 
+        path = config.get('dbcopy', 'path')
+
         # Drop target database
         if db_exists(target_database):
+            if path:
+                logger.info('Dumping %s database into %s' % (target_database,
+                        path))
+                _, error = dump_db(target_database, os.path.join(path,
+                        '%s-%s.sql' % (target_database,
+                            datetime.now().strftime('%Y-%m-%d_%H:%M:%S'))))
+                if error:
+                    send_error_message(user, 'dumping_db_error', error)
+                    return
             _, error = drop_db(target_database, target_username,
                 target_password)
             if error:
@@ -273,7 +284,6 @@ class CreateDb(Wizard):
 
         # Dump source database
         temporary = False
-        path = config.get('dbcopy', 'path')
         if path:
             path = os.path.join(path, '%s-%s.sql' % (source_database,
                     datetime.now().strftime('%Y-%m-%d_%H:%M:%S')))
@@ -281,7 +291,7 @@ class CreateDb(Wizard):
             temporary = True
             _, path = tempfile.mkstemp('-%s.sql' %
                 datetime.now().strftime('%Y-%m-%d_%H:%M:%S'))
-        logger.info('Dumping database into %s' % path)
+        logger.info('Dumping database %s into %s' % (source_database, path))
 
         _, error = dump_db(source_database, path)
         if error:
