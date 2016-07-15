@@ -11,4 +11,6 @@ copyright notices and license terms. -->
     <field name="database"/>
     <label name="username"/>
     <field name="username"/>
+    <label name="password"/>
+    <field name="password"/>
 </form>
