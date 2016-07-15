@@ -187,9 +187,9 @@ class CreateDb(Wizard):
             cursor.close()
             return database in databases
 
-        def dump_db(database, path, password):
+        def dump_db(database, path):
             command = ['pg_dump', '-f', path]
-            return execute_command(command, database, password)
+            return execute_command(command, database)
 
         def drop_db(database, username, password):
             command = ['dropdb', '-w']
@@ -277,7 +277,7 @@ class CreateDb(Wizard):
                 datetime.now().strftime('%Y-%m-%d_%H:%M:%S'))
         logger.info('Dumping database into %s' % path)
 
-        _, error = dump_db(source_database, path, target_password)
+        _, error = dump_db(source_database, path)
         if error:
             send_error_message(user, 'dumping_db_error', error)
             if temporary:
