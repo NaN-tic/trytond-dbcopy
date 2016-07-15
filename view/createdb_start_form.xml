@@ -7,6 +7,8 @@ copyright notices and license terms. -->
     <newline/>
     <label string="Warning! It is strongly recommended not to clone the database when other people are working on the ERP because this process stops any action they were performing." id="warning" yalign="0.0" xalign="0.0" xexpand="0" colspan="4"/>
     <newline/>
-    <label name="name"/>
-    <field name="name"/>
+    <label name="database"/>
+    <field name="database"/>
+    <label name="username"/>
+    <field name="username"/>
 </form>
