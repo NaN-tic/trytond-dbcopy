@@ -18,7 +18,6 @@ import tempfile
 import threading
 
 from sql import Table
-from sql.operators import Not, Like
 
 
 __all__ = ['CreateDbStart', 'CreateDbResult', 'CreateDb']
@@ -176,7 +175,6 @@ class CreateDb(Wizard):
                 env['PGPASSWORD'] = password
             command.append(database)
 
-            print "EXECUTING: ", command, env
             process = Popen(command, env=env, stdout=PIPE, stderr=PIPE)
             return process.communicate()
 
@@ -200,8 +198,6 @@ class CreateDb(Wizard):
             return execute_command(command, database, username, password)
 
         def force_drop_db(database, username, password):
-            pg_stat_activity = Table('pg_stat_activity')
-
             Database = backend.get('Database')
             cursor = Database().connect().cursor()
             query = "SELECT pid FROM pg_stat_activity WHERE datname='%s'" % database
