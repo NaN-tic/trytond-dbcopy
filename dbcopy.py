@@ -170,11 +170,6 @@ class CreateDb(Wizard):
             process = Popen(command, env=env, stdout=PIPE, stderr=PIPE)
             return process.communicate()
 
-        def get_tmp_file_name(database):
-            tmp = tempfile.gettempdir()
-            tmp_file = os.path.join(tmp, database + '.sql')
-            return tmp_file
-
         def db_exist(database):
             Database = backend.get('Database')
             database = Database().connect()
