@@ -181,9 +181,12 @@ class CreateDb(Wizard):
 
         def db_exists(database):
             Database = backend.get('Database')
-            database = Database().connect()
-            cursor = database.cursor()
-            databases = database.list(cursor)
+            cursor = Database().connect().cursor()
+
+            pg_database = Table('pg_database')
+            query = pg_database.select(pg_database.datname)
+            cursor.execute(*query)
+            databases = [x[0] for x in cursor.fetchall()]
             cursor.close()
             return database in databases
 
@@ -271,7 +274,10 @@ class CreateDb(Wizard):
         # Dump source database
         temporary = False
         path = config.get('dbcopy', 'path')
-        if not path:
+        if path:
+            path = os.path.join(path, '%s-%s.sql' % (source_database,
+                    datetime.now().strftime('%Y-%m-%d_%H:%M:%S')))
+        else:
             temporary = True
             _, path = tempfile.mkstemp('-%s.sql' %
                 datetime.now().strftime('%Y-%m-%d_%H:%M:%S'))
