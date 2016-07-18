@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 class CreateDbStart(ModelView):
     'Create DB Copy'
     __name__ = 'dbcopy.createdb.start'
-    database = fields.Char('Database Name')
+    database = fields.Char('Database Name', required=True)
     username = fields.Char('Database User')
     password = fields.Char('Database Password')
 
