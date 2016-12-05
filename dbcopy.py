@@ -190,7 +190,7 @@ class CreateDb(Wizard):
             return database in databases
 
         def dump_db(database, path, username=None, password=None):
-            command = ['pg_dump', '-f', path]
+            command = ['pg_dump', '--no-owner', '-f', path]
             return execute_command(command, database, username, password)
 
         def drop_db(database, username, password):
