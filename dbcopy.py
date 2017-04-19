@@ -38,7 +38,8 @@ class CreateDbStart(ModelView):
 
     @staticmethod
     def default_username():
-        return 'test'
+        dbname = Transaction().cursor.dbname
+        return '%s_test' % dbname
 
 
 class CreateDbResult(ModelView):
