@@ -6,11 +6,18 @@ copyright notices and license terms. -->
     <label string="It clones a production database to test. This action need some time to generate the database so, try to connect later." id="clone" yalign="0.0" xalign="0.0" xexpand="0" colspan="4"/>
     <newline/>
     <label string="Warning! It is strongly recommended not to clone the database when other people are working on the ERP because this process stops any action they were performing." id="warning" yalign="0.0" xalign="0.0" xexpand="0" colspan="4"/>
-    <newline/>
-    <label name="database"/>
-    <field name="database"/>
-    <label name="username"/>
-    <field name="username"/>
-    <label name="password"/>
-    <field name="password"/>
+    <separator id="source_info" string="Soruce" colspan="4"/>
+    <label name="source_database"/>
+    <field name="source_database"/>
+    <label name="source_username"/>
+    <field name="source_username"/>
+    <label name="source_password"/>
+    <field name="source_password"/>
+    <separator id="target_info" string="Target" colspan="4"/>
+    <label name="target_database"/>
+    <field name="target_database"/>
+    <label name="target_username"/>
+    <field name="target_username"/>
+    <label name="target_password"/>
+    <field name="target_password"/>
 </form>

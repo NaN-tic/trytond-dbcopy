@@ -4,11 +4,11 @@ msgstr "Content-Type: text/plain; charset=utf-8\n"
 
 msgctxt "error:dbcopy.createdb:"
 msgid ""
-"Database %s cloned successfully.\n"
+"Database %(source)s cloned successfully into %(target)s.\n"
 "Now you can connect to the new database."
 msgstr ""
-"La base de dades %s s'ha clonat amb éxit.\n"
-"Ara podeu connectar-vos a la nova base de dades."
+"Base de datos %(source)s duplicada correctamente dentro de %(target)s.\n"
+"Ahora ya puedes conectarte a la nueva base de datos."
 
 msgctxt "error:dbcopy.createdb:"
 msgid ""
@@ -27,8 +27,20 @@ msgid "Error dropping database %s."
 msgstr "Error esborrant la base de dades %s."
 
 msgctxt "error:dbcopy.createdb:"
+msgid "Error dumping database %s."
+msgstr "Error copiando la base de datos %s."
+
+msgctxt "error:dbcopy.createdb:"
 msgid "Error restoring database %s."
 msgstr "Error restaurant la base de dades %s."
+
+msgctxt "error:dbcopy.createdb:"
+msgid ""
+"To prevent removal of valid data, target database must contain \"test\" in "
+"its name."
+msgstr ""
+"Para prevenir eliminar datos validos, la base de datos destion tiene que "
+"contener \"test\" en el nombre."
 
 msgctxt "error:dbcopy.createdb:"
 msgid "Tryton dbcopy result of clone database %s"
@@ -47,6 +59,10 @@ msgstr ""
 " base de dades de producció i cloni una nova base de dades."
 
 msgctxt "error:dbcopy.createdb:"
+msgid "You cannot overwrite current database."
+msgstr "No puedes sobreescrivir la base de datos."
+
+msgctxt "error:dbcopy.createdb:"
 msgid "You database is not PSQL. Can not copy your database"
 msgstr "La base de dades no es PSQL. No es pot copiar la base de dades"
 
@@ -62,13 +78,29 @@ msgctxt "field:dbcopy.createdb.start,id:"
 msgid "ID"
 msgstr "ID"
 
-msgctxt "field:dbcopy.createdb.start,name:"
-msgid "DB Name"
-msgstr "Nom base de dades"
+msgctxt "field:dbcopy.createdb.start,source_database:"
+msgid "Database Name"
+msgstr "Nombre base de datos"
 
-msgctxt "field:dbcopy.createdb.start,super_pwd:"
-msgid "Super Password"
-msgstr "Contrasenya del servidor"
+msgctxt "field:dbcopy.createdb.start,source_password:"
+msgid "Database Password"
+msgstr "Contraseña"
+
+msgctxt "field:dbcopy.createdb.start,source_username:"
+msgid "Database User"
+msgstr "Usuario"
+
+msgctxt "field:dbcopy.createdb.start,target_database:"
+msgid "Database Name"
+msgstr "Nombre base de datos"
+
+msgctxt "field:dbcopy.createdb.start,target_password:"
+msgid "Database Password"
+msgstr "Contraseña"
+
+msgctxt "field:dbcopy.createdb.start,target_username:"
+msgid "Database User"
+msgstr "Usuario"
 
 msgctxt "model:dbcopy.createdb.result,name:"
 msgid "Create DB Copy"
@@ -115,6 +147,14 @@ msgstr ""
 "Clona la base de dades de producció per testeig. Aquesta acció necessita "
 "cert temps per generar la base de dades, per tant, intenti connectar més "
 "tard."
+
+msgctxt "view:dbcopy.createdb.start:"
+msgid "Soruce"
+msgstr "Orígen"
+
+msgctxt "view:dbcopy.createdb.start:"
+msgid "Target"
+msgstr "Destino"
 
 msgctxt "view:dbcopy.createdb.start:"
 msgid ""

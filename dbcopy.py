@@ -27,17 +27,32 @@ logger = logging.getLogger(__name__)
 class CreateDbStart(ModelView):
     'Create DB Copy'
     __name__ = 'dbcopy.createdb.start'
-    database = fields.Char('Database Name', required=True)
-    username = fields.Char('Database User')
-    password = fields.Char('Database Password')
+
+    source_database = fields.Char('Database Name', required=True)
+    source_username = fields.Char('Database User')
+    source_password = fields.Char('Database Password')
+
+    target_database = fields.Char('Database Name', required=True)
+    target_username = fields.Char('Database User')
+    target_password = fields.Char('Database Password')
 
     @staticmethod
-    def default_database():
+    def default_source_database():
+        dbname = Transaction().cursor.dbname
+        return '%s' % dbname
+
+    @staticmethod
+    def default_source_username():
+        dbname = Transaction().cursor.dbname
+        return '%s' % dbname
+
+    @staticmethod
+    def default_target_database():
         dbname = Transaction().cursor.dbname
         return '%s_test' % dbname
 
     @staticmethod
-    def default_username():
+    def default_target_username():
         dbname = Transaction().cursor.dbname
         return '%s_test' % dbname
 
@@ -96,9 +111,9 @@ class CreateDb(Wizard):
         if not to_addr:
             self.raise_user_error('user_email_error', user.name)
 
-        if self.start.database == transaction.cursor.dbname:
+        if self.start.target_database == transaction.cursor.dbname:
             self.raise_user_error('cannot_overwrite')
-        if not 'test' in self.start.database:
+        if not 'test' in self.start.target_database:
             self.raise_user_error('must_contain_test')
         user = transaction.user
 
@@ -108,14 +123,16 @@ class CreateDb(Wizard):
 
         thread = threading.Thread(
                 target=self.createdb_thread,
-                args=(user, transaction.cursor.dbname, self.start.database,
-                self.start.username, self.start.password), kwargs={})
+                args=(user, self.start.source_database,
+                self.start.source_username, self.start.source_password,
+                self.start.target_database, self.start.target_username,
+                self.start.target_password), kwargs={})
         thread.start()
         return 'result'
 
     @classmethod
-    def createdb_thread(cls, user, source_database, target_database,
-            target_username, target_password):
+    def createdb_thread(cls, user, source_database, source_username,
+            source_password, target_database, target_username, target_password):
 
         def prepare_message(user):
             user = Pool().get('res.user')(user)
@@ -176,6 +193,7 @@ class CreateDb(Wizard):
                 env['PGPASSWORD'] = password
             command.append(database)
 
+            logger.info('Command to execute: %s' % command)
             process = Popen(command, env=env, stdout=PIPE, stderr=PIPE)
             return process.communicate()
 
@@ -192,10 +210,12 @@ class CreateDb(Wizard):
 
         def dump_db(database, path, username=None, password=None):
             command = ['pg_dump', '--no-owner', '-f', path]
+            logger.info('Command to dump: %s' % command)
             return execute_command(command, database, username, password)
 
         def drop_db(database, username, password):
             command = ['dropdb', '-w']
+            logger.info('Command to drop: %s' % command)
             return execute_command(command, database, username, password)
 
         def force_drop_db(database, username, password):
@@ -216,19 +236,21 @@ class CreateDb(Wizard):
             if username:
                 command += ['-O', username]
             command += ['-T', 'template0']
+            logger.info('Command to create: %s' % command)
             return execute_command(command, database, username, password)
 
         def restore_db(path, database, username, password):
             command = ['psql', '-q', '-f', path]
+            logger.info('Command to restore: %s' % command)
             return execute_command(command, database, username, password)
 
-        def deactivate_crons(database):
+        def deactivate_crons(database, username, password):
             cron = Table('ir_cron')
             query = cron.update([cron.active], [False])
             query = tuple(query)[0] % query.params
             command = ['psql', '-c', query]
-            return execute_command(command, database)
-
+            logger.info('Command to deactivate crons: %s' % command)
+            return execute_command(command, database, username, password)
 
         path = config.get('dbcopy', 'path')
 
@@ -272,7 +294,8 @@ class CreateDb(Wizard):
                 datetime.now().strftime('%Y-%m-%d_%H:%M:%S'))
         logger.info('Dumping database %s into %s' % (source_database, path))
 
-        _, error = dump_db(source_database, path)
+        _, error = dump_db(source_database, path, source_username,
+            source_password)
         if error:
             send_error_message(user, 'dumping_db_error', error)
             if temporary:
@@ -286,14 +309,15 @@ class CreateDb(Wizard):
             send_error_message(user, 'restoring_db_error', error)
             if temporary:
                 os.remove(path)
-            return
+            #return
 
         # Remove dump file
         if temporary:
             os.remove(path)
 
         # Deactivate crons on target database
-        _, error = deactivate_crons(target_database)
+        _, error = deactivate_crons(target_database, target_username,
+            target_password)
         if error:
             send_error_message(user, 'connection_error', error)
             return
