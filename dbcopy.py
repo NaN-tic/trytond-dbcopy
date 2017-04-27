@@ -16,6 +16,7 @@ from trytond.wizard import Wizard, StateView, StateTransition, Button
 import logging
 import tempfile
 import threading
+import psycopg2
 
 from sql import Table
 
@@ -219,9 +220,16 @@ class CreateDb(Wizard):
             return execute_command(command, database, username, password)
 
         def force_drop_db(database, username, password):
-            Database = backend.get('Database')
-            cursor = Database().connect().cursor()
-            query = "SELECT pid FROM pg_stat_activity WHERE datname='%s'" % database
+            conn = psycopg2.connect("dbname='%s' user='%s' password='%s'" %
+                (database, username, password))
+            cursor = conn.cursor()
+            query = """SELECT
+                           pid
+                       FROM
+                           pg_stat_activity
+                       WHERE
+                           datname='%s' AND
+                           pid != pg_backend_pid()""", database
             cursor.execute(query)
             pids = [x[0] for x in cursor.fetchall()]
             for pid in pids:
@@ -229,6 +237,8 @@ class CreateDb(Wizard):
                 cursor.execute(query)
                 query = 'SELECT pg_terminate_backend(%s)' % pid
                 cursor.execute(query)
+            conn.commit()
+            conn.close()
             return drop_db(database, username, password)
 
         def create_db(database, username, password):
