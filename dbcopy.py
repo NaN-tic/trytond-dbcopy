@@ -229,7 +229,7 @@ class CreateDb(Wizard):
                            pg_stat_activity
                        WHERE
                            datname='%s' AND
-                           pid != pg_backend_pid()""", database
+                           pid != pg_backend_pid()""" % database
             cursor.execute(query)
             pids = [x[0] for x in cursor.fetchall()]
             for pid in pids:
