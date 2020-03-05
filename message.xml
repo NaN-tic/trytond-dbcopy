@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<!-- This file is part of Tryton.  The COPYRIGHT file at the top level of
+this repository contains the full copyright notices and license terms. -->
+<tryton>
+    <data grouped="1">
+        <record model="ir.message" id="cannot_overwrite">
+          <field name="text">You cannot overwrite current database.</field>
+        </record>
+        <record model="ir.message" id="dbname_error">
+            <field name="text">You can not clone a database from a test database. Connect to live database and clone new test database.</field>
+        </record>
+        <record model="ir.message" id="dbname_scheme">
+            <field name="text">You database is not PSQL. Can not copy your database</field>
+        </record>
+        <record model="ir.message" id="email_subject">
+              <field name="text">Tryton dbcopy result of clone database "%(source_database)s"</field>
+        </record>
+        <record model="ir.message" id="db_cloned_successfully">
+              <field name="text">Database "%(source)s" cloned successfully into "%(target)s". \n Now you can connect to the new database</field>
+        </record>
+        <record model="ir.message" id="dumping_db_error">
+              <field name="text">Error dumping database "%(source)s".</field>
+        </record>
+        <record model="ir.message" id="dropping_db_error">
+              <field name="text">Error dropping database  "%(source)s".</field>
+        </record>
+        <record model="ir.message" id="creating_db_error">
+              <field name="text">Error creating database "%(source)s".</field>
+        </record>
+        <record model="ir.message" id="restoring_db_error">
+              <field name="text">Error restoring database "%(source)s".</field>
+        </record>
+        <record model="ir.message" id="user_email_error">
+              <field name="text">User "%(user)s" has not got any email address.</field>
+        </record>
+        <record model="ir.message" id="connection_error">
+              <field name="text">Error connection to new test database. \nPlease, create new test database or contact us.</field>
+        </record>
+        <record model="ir.message" id="must_contain_test">
+              <field name="text">To prevent removal of valid data, target database muest contain "test" in its name.</field>
+        </record>
+    </data>
+</tryton>

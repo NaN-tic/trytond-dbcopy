@@ -1,0 +1,143 @@
+#
+msgid ""
+msgstr "Content-Type: text/plain; charset=utf-8\n"
+
+msgctxt "model:ir.message,text:cannot_overwrite"
+msgid "You cannot overwrite current database."
+msgstr "No puedes sobrescribir la base de datos actual."
+
+msgctxt "model:ir.message,text:db_cloned_successfully"
+msgid "Database \"%(source)s\" cloned successfully into \"%(target)s\".\n Now you can connect to the new database"
+msgstr "Base de datos \"%(source)s\" clonada con éxito en \"%(target)s\".\n Ahora puede conectarse a la nueva base de datos."
+
+msgctxt "model:ir.message,text:connection_error"
+msgid "Error connection to new test database.\n Please, create new test database or contact us."
+msgstr "Error en la conexión a la nueva base de datos.\n Cree de nuevo una nueva copia o contacte con nosotros."
+
+msgctxt "model:ir.message,text:dumping_db_error"
+msgid "Error dumping database \"%(source)s\"."
+msgstr "Error volcando la base de datos \"%(source)s\"."
+
+msgctxt "model:ir.message,text:creating_db_error"
+msgid "Error creating database \"%(source)s\"."
+msgstr "Error creando la base de datos \"%(source)s\"."
+
+msgctxt "model:ir.message,text:dropping_db_error"
+msgid "Error dropping database \"%(source)s\"."
+msgstr "Error borrando la base de datos \"%(source)s\"."
+
+msgctxt "model:ir.message,text:restoring_db_error"
+msgid "Error restoring database \"%(source)s\"."
+msgstr "Error restaurando la base de datos \"%(source)s\"."
+
+msgctxt "model:ir.message,text:email_subject"
+msgid "Tryton dbcopy result of clone database \"%(source_database)s\""
+msgstr "Resultado de Trytond dbcopy de clonación de la base de datos \"%(source_database)s\""
+
+msgctxt "model:ir.message,text:user_email_error"
+msgid "User \"%(user)s\" has not got any email address."
+msgstr "El usuario \"%(user)s\" no tiene ninguna dirección de correo electrónico."
+
+msgctxt "model:ir.message,text:dbname_error"
+msgid "You can not clone a database from a test database. Connect to live database and clone new test database."
+msgstr "No puede clonar una base de datos que el orígen ya es una copia. Connecte a la base de datos de producción y clone una nueva base de datos."
+
+msgctxt "model:ir.message,text:dbname_scheme"
+msgid "You database is not PSQL. Can not copy your database"
+msgstr "La base de datos no es PSQL. No se puede copiar la base de datos"
+
+msgctxt "field:dbcopy.createdb.result,id:"
+msgid "ID"
+msgstr "ID"
+
+msgctxt "field:dbcopy.createdb.result,name:"
+msgid "DB Name"
+msgstr "Nombre base de datos"
+
+msgctxt "field:dbcopy.createdb.start,id:"
+msgid "ID"
+msgstr "ID"
+
+msgctxt "field:dbcopy.createdb.start,database:"
+msgid "Database Name"
+msgstr "Nombre base de datos"
+
+msgctxt "field:dbcopy.createdb.start,username:"
+msgid "Database User"
+msgstr "Usuario del servidor"
+
+msgctxt "field:dbcopy.createdb.start,password:"
+msgid "Database Password"
+msgstr "Contraseña del servidor"
+
+msgctxt "model:dbcopy.createdb.result,name:"
+msgid "Create DB Copy"
+msgstr "Crear base de datos copia"
+
+msgctxt "model:dbcopy.createdb.start,name:"
+msgid "Create DB Copy"
+msgstr "Crear base de datos copia"
+
+msgctxt "model:ir.action,name:act_dbcopy_createdb"
+msgid "Create DB Copy"
+msgstr "Crear base de datos copia"
+
+msgctxt "model:ir.ui.menu,name:menu_dbcopy"
+msgid "DB Copy"
+msgstr "Copia base de datos"
+
+msgctxt "model:ir.ui.menu,name:menu_dbcopy_createdb"
+msgid "Create DB Copy"
+msgstr "Crear base de datos copia"
+
+msgctxt "view:dbcopy.createdb.result:"
+msgid "DB Copy"
+msgstr "Copia base de datos"
+
+msgctxt "view:dbcopy.createdb.result:"
+msgid "Tryton Server has started to clone Database. You cannot"
+msgstr "El servidor ha iniciado el proceso de clonación de la base de datos. No se "
+
+msgctxt "view:dbcopy.createdb.result:"
+msgid "connect to the database until you have received a mail notifying"
+msgstr "podrá conectar a la base de datos hasta recibir el correo electrónico que le"
+
+msgctxt "view:dbcopy.createdb.result:"
+msgid "that you can do it."
+msgstr " indicará que se encuentra operativo."
+
+msgctxt "view:dbcopy.createdb.start:"
+msgid "DB Copy"
+msgstr "Copia base de datos"
+
+msgctxt "view:dbcopy.createdb.start:"
+msgid "It clones a production database to test. This action need some time"
+msgstr "Clona la base de datos de producción para pruebas. Esta acción requiere algo"
+
+msgctxt "view:dbcopy.createdb.start:"
+msgid "to generate the database so, try to connect later."
+msgstr "de tiempo para generar la base de datos, por lo que, trate de conectarse más tarde."
+
+msgctxt "view:dbcopy.createdb.start:"
+msgid "Warning! It is strongly recommended not to clone the database when other"
+msgstr "¡Atención! Se Recomienda encarecidamente no clonar la base de datos cuando otras "
+
+msgctxt "view:dbcopy.createdb.start:"
+msgid "people are working on the ERP because this process stops"
+msgstr "personas están trabajando en el ERP porque este proceso detiene"
+
+msgctxt "view:dbcopy.createdb.start:"
+msgid "any action they were performing."
+msgstr "cualquier acción que estuvieran realizando."
+
+msgctxt "wizard_button:dbcopy.createdb,result,end:"
+msgid "Close"
+msgstr "Cerrar"
+
+msgctxt "wizard_button:dbcopy.createdb,start,createdb:"
+msgid "Create database copy"
+msgstr "Crear una base de datos copia"
+
+msgctxt "wizard_button:dbcopy.createdb,start,end:"
+msgid "Cancel"
+msgstr "Cancelar"

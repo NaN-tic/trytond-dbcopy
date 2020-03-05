@@ -7,8 +7,7 @@ from trytond.transaction import Transaction
 __all__ = ['User']
 
 
-class User:
-    __metaclass__ = PoolMeta
+class User(metaclass=PoolMeta):
     __name__ = "res.user"
 
     def get_status_bar(self, name):

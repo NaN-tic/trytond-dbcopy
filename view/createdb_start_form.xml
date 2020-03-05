@@ -2,15 +2,24 @@
 <!-- This file is part of dbcopy module for Tryton.
 The COPYRIGHT file at the top level of this repository contains the full
 copyright notices and license terms. -->
-<form string="DB Copy" col="4">
-    <label string="It clones a production database to test. This action need some time to generate the database so, try to connect later." id="clone" yalign="0.0" xalign="0.0" xexpand="0" colspan="4"/>
+<form>
+  <group id="fields_dbcopy">
+	  <label string="It clones a production database to test. This action need some time" id="clone1" colspan="4" yfill="1" xfill="1" xalign="0" />
+	  <label string="to generate the database so, try to connect later." id="clone2" colspan="2" yfill="1" xfill="1" xalign="0"/>
     <newline/>
-    <label string="Warning! It is strongly recommended not to clone the database when other people are working on the ERP because this process stops any action they were performing." id="warning" yalign="0.0" xalign="0.0" xexpand="0" colspan="4"/>
+    <label string="Warning! It is strongly recommended not to clone the database when other" id="warning1" colspan="2" yfill="1" xfill="1" xalign="0" />
+    <newline/>
+    <label string="people are working on the ERP because this process stops" id="warning2" colspan="2" yfill="1" xfill="1" xalign="0"/>
+    <newline/>
+    <label string="any action they were performing." id="warning3" colspan="2" yfill="1" xfill="1" xalign="0"/>
     <newline/>
     <label name="database"/>
     <field name="database"/>
+    <newline/>
     <label name="username"/>
     <field name="username"/>
+    <newline/>
     <label name="password"/>
     <field name="password"/>
+  </group>
 </form>

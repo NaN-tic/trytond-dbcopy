@@ -1,0 +1,144 @@
+#
+msgid ""
+msgstr "Content-Type: text/plain; charset=utf-8\n"
+
+msgctxt "model:ir.message,text:cannot_overwrite"
+msgid "You cannot overwrite current database."
+msgstr "No podeu sobreescriure la base de dades actual."
+
+msgctxt "model:ir.message,text:db_cloned_successfully"
+msgid "Database \"%(source)s\" cloned successfully into \"%(target)s\".\n Now you can connect to the new database"
+msgstr "La base de dades \"%(source)s\" s'ha clonat amb éxit a \"%(target)s\".\n Ara podeu connectar-vos a la nova base de dades."
+
+msgctxt "model:ir.message,text:connection_error"
+msgid "Error connection to new test database.\n Please, create new test database or contact us."
+msgstr "Error en la connexió a la nova base de dades.\n Crea de nou la copia o contacti amb nosaltres."
+
+msgctxt "model:ir.message,text:dumping_db_error"
+msgid "Error dumping database \"%(source)s\"."
+msgstr "Error bolcant la base de dades \"%(source)s\"."
+
+msgctxt "model:ir.message,text:creating_db_error"
+msgid "Error creating database \"%(source)s\"."
+msgstr "Error creant la base de dades \"%(source)s\"."
+
+msgctxt "model:ir.message,text:dropping_db_error"
+msgid "Error dropping database \"%(source)s\"."
+msgstr "Error esborrant la base de dades \"%(source)s\"."
+
+msgctxt "model:ir.message,text:restoring_db_error"
+msgid "Error restoring database \"%(source)s\"."
+msgstr "Error restaurant la base de dades \"%(source)s\"."
+
+msgctxt "model:ir.message,text:email_subject"
+msgid "Tryton dbcopy result of clone database \"%(source_database)s\""
+msgstr "Resultat de Trytond dbcopy de clonació de base de dades \"%(source_database)s\""
+
+msgctxt "model:ir.message,text:user_email_error"
+msgid "User \"%(user)s\" has not got any email address."
+msgstr "L'usuari \"%(user)s\" no té cap adreça de correu electrònic."
+
+msgctxt "model:ir.message,text:dbname_error"
+msgid "You can not clone a database from a test database. Connect to live database and clone new test database."
+msgstr "No pot clonar una base de dades que l'orígen ja es una copia. Connectis a la base de dades de producció i cloni una nova base de dades."
+
+msgctxt "model:ir.message,text:dbname_scheme"
+msgid "You database is not PSQL. Can not copy your database"
+msgstr "La base de dades no es PSQL. No es pot copiar la base de dades"
+
+msgctxt "field:dbcopy.createdb.result,id:"
+msgid "ID"
+msgstr "ID"
+
+msgctxt "field:dbcopy.createdb.result,name:"
+msgid "DB Name"
+msgstr "Nom base de dades"
+
+msgctxt "field:dbcopy.createdb.start,id:"
+msgid "ID"
+msgstr "ID"
+
+msgctxt "field:dbcopy.createdb.start,database:"
+msgid "Database Name"
+msgstr "Nombre base de datos"
+
+msgctxt "field:dbcopy.createdb.start,username:"
+msgid "Database User"
+msgstr "Usuari del servidor"
+
+msgctxt "field:dbcopy.createdb.start,password:"
+msgid "Database Password"
+msgstr "Contrasenya del servidor"
+
+msgctxt "model:dbcopy.createdb.result,name:"
+msgid "Create DB Copy"
+msgstr "Crea una base de dades copia"
+
+msgctxt "model:dbcopy.createdb.start,name:"
+msgid "Create DB Copy"
+msgstr "Crea una base de dades copia"
+
+msgctxt "model:ir.action,name:act_dbcopy_createdb"
+msgid "Create DB Copy"
+msgstr "Crea una base de dades copia"
+
+msgctxt "model:ir.ui.menu,name:menu_dbcopy"
+msgid "DB Copy"
+msgstr "Copia base de dades"
+
+msgctxt "model:ir.ui.menu,name:menu_dbcopy_createdb"
+msgid "Create DB Copy"
+msgstr "Crea una base de dades copia"
+
+msgctxt "view:dbcopy.createdb.result:"
+msgid "DB Copy"
+msgstr "Copia base de dades"
+
+msgctxt "view:dbcopy.createdb.result:"
+msgid "Tryton Server has started to clone Database. You cannot"
+msgstr "El servidor ha iniciat el procés de clonació de la "
+
+msgctxt "view:dbcopy.createdb.result:"
+msgid "connect to the database until you have received a mail notifying"
+msgstr "base de dades. No es podrà connectar a la base de dades fins"
+
+msgctxt "view:dbcopy.createdb.result:"
+msgid "that you can do it."
+msgstr "que rebi el correu electrònic que li indicarà que ja es troba operatiu."
+
+
+msgctxt "view:dbcopy.createdb.start:"
+msgid "DB Copy"
+msgstr "Copia base de dades"
+
+msgctxt "view:dbcopy.createdb.start:"
+msgid "It clones a production database to test. This action need some time"
+msgstr "Clona la base de dades de producció per testeig. Aquesta acció necessita "
+
+msgctxt "view:dbcopy.createdb.start:"
+msgid "to generate the database so, try to connect later."
+msgstr "cert temps per generar la base de dades, per tant, intenti connectar més tard."
+
+msgctxt "view:dbcopy.createdb.start:"
+msgid "Warning! It is strongly recommended not to clone the database when other"
+msgstr "Atenció! Es recomana encaridament no clonar la base de dades quan altres "
+
+msgctxt "view:dbcopy.createdb.start:"
+msgid "people are working on the ERP because this process stops"
+msgstr "persones estan treballant a l'ERP perque aquest procés atura qualsevol acció"
+
+msgctxt "view:dbcopy.createdb.start:"
+msgid "any action they were performing."
+msgstr " que estiguessin realitzant."
+
+msgctxt "wizard_button:dbcopy.createdb,result,end:"
+msgid "Close"
+msgstr "Tanca"
+
+msgctxt "wizard_button:dbcopy.createdb,start,createdb:"
+msgid "Create database copy"
+msgstr "Crea una base de dades copia"
+
+msgctxt "wizard_button:dbcopy.createdb,start,end:"
+msgid "Cancel"
+msgstr "Cancel·la"

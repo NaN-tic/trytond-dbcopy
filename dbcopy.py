@@ -13,6 +13,8 @@ from trytond.pool import Pool
 from trytond.sendmail import sendmail
 from trytond.transaction import Transaction
 from trytond.wizard import Wizard, StateView, StateTransition, Button
+from trytond.i18n import gettext
+from trytond.exceptions import UserError, UserWarning
 import logging
 import tempfile
 import threading
@@ -27,6 +29,7 @@ logger = logging.getLogger(__name__)
 class CreateDbStart(ModelView):
     'Create DB Copy'
     __name__ = 'dbcopy.createdb.start'
+
     database = fields.Char('Database Name', required=True)
     username = fields.Char('Database User')
     password = fields.Char('Database Password')
@@ -63,51 +66,25 @@ class CreateDb(Wizard):
             Button('Close', 'end', 'tryton-close'),
             ])
 
-    @classmethod
-    def __setup__(cls):
-        super(CreateDb, cls).__setup__()
-        cls._error_messages.update({
-                'dbname_error': ('You can not clone a database from a test '
-                    'database. Connect to live database and clone a new test '
-                    'database.'),
-                'dbname_scheme': ('You database is not PSQL. Can not copy your '
-                    'database'),
-                'email_subject': 'Tryton dbcopy result of clone database %s',
-                'db_cloned_successfully': ('Database %(source)s cloned '
-                    'successfully into %(target)s.\nNow you can connect to the '
-                    'new database.'),
-                'dumping_db_error': 'Error dumping database %s.',
-                'dropping_db_error': 'Error dropping database %s.',
-                'creating_db_error': 'Error creating database %s.',
-                'restoring_db_error': 'Error restoring database %s.',
-                'user_email_error': 'User %s has not got any email address.',
-                'connection_error': 'Error connection to new test database.\n'
-                    'Please, create new test database or contact us.',
-                'cannot_overwrite': 'You cannot overwrite current database.',
-                'must_contain_test': ('To prevent removal of valid data, '
-                    'target database must contain "test" in its name.'),
-                })
-
     def transition_createdb(self):
         transaction = Transaction()
         user = Pool().get('res.user')(transaction.user)
         to_addr = user.email or config.get('email', 'from')
         if not to_addr:
-            self.raise_user_error('user_email_error', user.name)
-
-        if self.start.database == transaction.cursor.dbname:
-            self.raise_user_error('cannot_overwrite')
+            raise UserError(gettext('dbcopy.user_email_error', user=user.name))
+        if self.start.database == transaction.database.name:
+            raise UserError(gettext('dbcopy.cannot_overwrite'))
         if not 'test' in self.start.database:
-            self.raise_user_error('must_contain_test')
+            raise UserError(gettext('dbcopy.must_contain_test'))
         user = transaction.user
 
         uri = parse_uri(config.get('database', 'uri'))
         if not uri.scheme == 'postgresql':
-            self.raise_user_error('dbname_scheme')
+            raise UserError(gettext('dbcopy.dbname_scheme'))
 
         thread = threading.Thread(
                 target=self.createdb_thread,
-                args=(user, transaction.cursor.dbname, self.start.database,
+                args=(user, transaction.database.name, self.start.database,
                 self.start.username, self.start.password), kwargs={})
         thread.start()
         return 'result'
@@ -121,10 +98,10 @@ class CreateDb(Wizard):
 
             to_addr = user.email or config.get('email', 'from')
             if not to_addr:
-                cls.raise_user_error('user_email_error', user.name)
+                raise UserError('dbcopy.user_email_error', user=user.name)
             from_addr = config.get('email', 'from')
-            subject = cls.raise_user_error('email_subject', (source_database,),
-                raise_exception=False)
+            subject = gettext('dbcopy.email_subject',
+                source_database=source_database)
             return to_addr, from_addr, subject
 
         def send_message(from_addr, to_addr, subject, body):
@@ -133,18 +110,15 @@ class CreateDb(Wizard):
             msg['From'] = from_addr
             msg['Subject'] = Header(subject, 'utf-8')
             try:
-                server = get_smtp_server()
-                server.sendmail(from_addr, ', '.join(to_addr), msg.as_string())
-                server.quit()
+                sendmail(msg['From'],msg['To'],msg)
                 logger.info('eMail delivered to %s ' % msg['To'])
-            except Exception, exception:
+            except Exception as exception:
                 logger.warning('Unable to deliver email (%s):\n %s'
                     % (exception, msg.as_string()))
 
         def send_error_message(user, message, error):
             with Transaction().start(source_database, user):
-                message = cls.raise_user_error(message, (source_database,),
-                    raise_exception=False).decode("ascii", "replace")
+                message = gettext(message, source=source_database)
                 message += '\n\n'+ error.decode("ascii", "replace")
                 logger.warning(message)
                 to_addr, from_addr, subject = prepare_message(user)
@@ -152,10 +126,8 @@ class CreateDb(Wizard):
 
         def send_successfully_message(user, message):
             with Transaction().start(source_database, user):
-                message = cls.raise_user_error(message, {
-                        'source': source_database,
-                        'target': target_database,
-                        }, raise_exception=False)
+                message = gettext(message,
+                    source=source_database, target=target_database)
                 logger.info('Database %s cloned successfully.' %
                     source_database)
                 to_addr, from_addr, subject = prepare_message(user)
@@ -175,13 +147,14 @@ class CreateDb(Wizard):
                 env['PGPASSWORD'] = password
             command.append(database)
 
+            logger.info('Command to execute: %s' % command)
             process = Popen(command, env=env, stdout=PIPE, stderr=PIPE)
             return process.communicate()
 
         def db_exists(database):
             Database = backend.get('Database')
-            cursor = Database().connect().cursor()
 
+            cursor = Transaction().connection.cursor()
             pg_database = Table('pg_database')
             query = pg_database.select(pg_database.datname)
             cursor.execute(*query)
@@ -191,15 +164,17 @@ class CreateDb(Wizard):
 
         def dump_db(database, path, username=None, password=None):
             command = ['pg_dump', '-f', path]
+            logger.info('Command to dump: %s' % command)
             return execute_command(command, database, username, password)
 
         def drop_db(database, username, password):
             command = ['dropdb', '-w']
+            logger.info('Command to drop: %s' % command)
             return execute_command(command, database, username, password)
 
         def force_drop_db(database, username, password):
             Database = backend.get('Database')
-            cursor = Database().connect().cursor()
+            cursor = Transaction().connection.cursor()
             query = "SELECT pid FROM pg_stat_activity WHERE datname='%s'" % database
             cursor.execute(query)
             pids = [x[0] for x in cursor.fetchall()]
@@ -215,10 +190,12 @@ class CreateDb(Wizard):
             if username:
                 command += ['-O', username]
             command += ['-T', 'template0']
+            logger.info('Command to create: %s' % command)
             return execute_command(command, database, username, password)
 
         def restore_db(path, database, username, password):
             command = ['psql', '-q', '-f', path]
+            logger.info('Command to restore: %s' % command)
             return execute_command(command, database, username, password)
 
         def deactivate_crons(database):
@@ -226,78 +203,81 @@ class CreateDb(Wizard):
             query = cron.update([cron.active], [False])
             query = tuple(query)[0] % query.params
             command = ['psql', '-c', query]
+            logger.info('Command to deactivate crons: %s' % command)
             return execute_command(command, database)
 
 
         path = config.get('dbcopy', 'path')
 
-        # Drop target database
-        if db_exists(target_database):
-            if path:
-                logger.info('Dumping %s database into %s' % (target_database,
-                        path))
-                _, error = dump_db(target_database, os.path.join(path,
-                        '%s-%s.sql' % (target_database,
-                            datetime.now().strftime('%Y-%m-%d_%H:%M:%S'))),
-                    target_username, target_password)
-                if error:
-                    send_error_message(user, 'dumping_db_error', error)
-                    return
-            _, error = drop_db(target_database, target_username,
-                target_password)
-            if error:
-		logger.info('Could not drop database %s. Trying to force.' %
-                    target_database)
-                _, error = force_drop_db(target_database, target_username,
+        with Transaction().start(source_database, user):
+            # Drop target database
+            if db_exists(target_database):
+                if path:
+                    logger.info('Dumping %s database into %s' % (target_database,
+                            path))
+                    _, error = dump_db(target_database, os.path.join(path,
+                            '%s-%s.sql' % (target_database,
+                                datetime.now().strftime('%Y-%m-%d_%H:%M:%S'))),
+                        target_username, target_password)
+                    if error:
+                        send_error_message(user, 'dbcopy.dumping_db_error', error)
+                        return
+                _, error = drop_db(target_database, target_username,
                     target_password)
                 if error:
-                    send_error_message(user, 'dropping_db_error', error)
-                    return
+                    logger.info('Could not drop database %s. Trying to force.' %
+                        target_database)
+                    _, error = force_drop_db(target_database, target_username,
+                        target_password)
+                    if error:
+                        send_error_message(user, 'dbcopy.dropping_db_error', error)
+                        return
 
-        # Create target database
-        _, error = create_db(target_database, target_username, target_password)
-        if error:
-            send_error_message(user, 'creating_db_error', error)
-            return
+            # Create target database
+            _, error = create_db(target_database, target_username,
+                target_password)
+            if error:
+                send_error_message(user, 'dbcopy.creating_db_error', error)
+                return
 
-        # Dump source database
-        temporary = False
-        if path:
-            path = os.path.join(path, '%s-%s.sql' % (source_database,
-                    datetime.now().strftime('%Y-%m-%d_%H:%M:%S')))
-        else:
-            temporary = True
-            _, path = tempfile.mkstemp('-%s.sql' %
-                datetime.now().strftime('%Y-%m-%d_%H:%M:%S'))
-        logger.info('Dumping database %s into %s' % (source_database, path))
+            # Dump source database
+            temporary = False
+            if path:
+                path = os.path.join(path, '%s-%s.sql' % (source_database,
+                        datetime.now().strftime('%Y-%m-%d_%H:%M:%S')))
+            else:
+                temporary = True
+                _, path = tempfile.mkstemp('-%s.sql' %
+                    datetime.now().strftime('%Y-%m-%d_%H:%M:%S'))
+            logger.info('Dumping database %s into %s' % (source_database, path))
 
-        _, error = dump_db(source_database, path)
-        if error:
-            send_error_message(user, 'dumping_db_error', error)
+            _, error = dump_db(source_database, path)
+            if error:
+                send_error_message(user, 'dbcopy.dumping_db_error', error)
+                if temporary:
+                    os.remove(path)
+                return
+
+            # Restore into target database
+            _, error = restore_db(path, target_database, target_username,
+                target_password)
+            if error:
+                send_error_message(user, 'dbcopy.restoring_db_error', error)
+                if temporary:
+                    os.remove(path)
+                return
+
+            # Remove dump file
             if temporary:
                 os.remove(path)
-            return
 
-        # Restore into target database
-        _, error = restore_db(path, target_database, target_username,
-            target_password)
-        if error:
-            send_error_message(user, 'restoring_db_error', error)
-            if temporary:
-                os.remove(path)
-            return
+            # Deactivate crons on target database
+            _, error = deactivate_crons(target_database)
+            if error:
+                raise UserError('dbcopy.connection_error')
+                return
 
-        # Remove dump file
-        if temporary:
-            os.remove(path)
-
-        # Deactivate crons on target database
-        _, error = deactivate_crons(target_database)
-        if error:
-            send_error_message(user, 'connection_error', error)
-            return
-
-        send_successfully_message(user, 'db_cloned_successfully')
+        send_successfully_message(user, 'dbcopy.db_cloned_successfully')
 
     def default_result(self, fields):
         return {}
