@@ -6,7 +6,6 @@ from datetime import datetime
 from email.header import Header
 from email.mime.text import MIMEText
 from subprocess import Popen, PIPE
-from trytond import backend
 from trytond.config import config, parse_uri
 from trytond.model import ModelView, fields
 from trytond.pool import Pool
@@ -14,7 +13,7 @@ from trytond.sendmail import sendmail
 from trytond.transaction import Transaction
 from trytond.wizard import Wizard, StateView, StateTransition, Button
 from trytond.i18n import gettext
-from trytond.exceptions import UserError, UserWarning
+from trytond.exceptions import UserError
 import logging
 import tempfile
 import threading
@@ -152,8 +151,6 @@ class CreateDb(Wizard):
             return process.communicate()
 
         def db_exists(database):
-            Database = backend.get('Database')
-
             cursor = Transaction().connection.cursor()
             pg_database = Table('pg_database')
             query = pg_database.select(pg_database.datname)
@@ -173,7 +170,6 @@ class CreateDb(Wizard):
             return execute_command(command, database, username, password)
 
         def force_drop_db(database, username, password):
-            Database = backend.get('Database')
             cursor = Transaction().connection.cursor()
             query = "SELECT pid FROM pg_stat_activity WHERE datname='%s'" % database
             cursor.execute(query)
