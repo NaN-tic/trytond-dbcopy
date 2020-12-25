@@ -2,6 +2,10 @@
 # The COPYRIGHT file at the top level of this repository contains
 # the full copyright notices and license terms.
 import os
+import logging
+import tempfile
+import threading
+from sql import Table
 from datetime import datetime
 from email.header import Header
 from email.mime.text import MIMEText
@@ -14,14 +18,8 @@ from trytond.transaction import Transaction
 from trytond.wizard import Wizard, StateView, StateTransition, Button
 from trytond.i18n import gettext
 from trytond.exceptions import UserError
-import logging
-import tempfile
-import threading
-
-from sql import Table
 
 
-__all__ = ['CreateDbStart', 'CreateDbResult', 'CreateDb']
 logger = logging.getLogger(__name__)
 
 
