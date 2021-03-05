@@ -27,18 +27,19 @@ class CreateDbStart(ModelView):
     'Create DB Copy'
     __name__ = 'dbcopy.createdb.start'
 
-    database = fields.Char('Database Name', required=True)
+    database = fields.Char('Database Name', readonly=True)
     username = fields.Char('Database User')
     password = fields.Char('Database Password')
 
     @staticmethod
     def default_database():
         dbname = Transaction().database.name
-        return '%s_test' % dbname
+        return '%s-test' % dbname
 
     @staticmethod
     def default_username():
-        return 'test'
+        dbname = Transaction().database.name
+        return '%s-test' % dbname
 
 
 class CreateDbResult(ModelView):
@@ -163,21 +164,9 @@ class CreateDb(Wizard):
             return execute_command(command, database, username, password)
 
         def drop_db(database, username, password):
-            command = ['dropdb', '-w']
+            command = ['dropdb', '-w', '--force']
             logger.info('Command to drop: %s' % command)
             return execute_command(command, database, username, password)
-
-        def force_drop_db(database, username, password):
-            cursor = Transaction().connection.cursor()
-            query = "SELECT pid FROM pg_stat_activity WHERE datname='%s'" % database
-            cursor.execute(query)
-            pids = [x[0] for x in cursor.fetchall()]
-            for pid in pids:
-                query = 'SELECT pg_cancel_backend(%s)' % pid
-                cursor.execute(query)
-                query = 'SELECT pg_terminate_backend(%s)' % pid
-                cursor.execute(query)
-            return drop_db(database, username, password)
 
         def create_db(database, username, password):
             command = ['createdb']
@@ -204,6 +193,7 @@ class CreateDb(Wizard):
         path = config.get('dbcopy', 'path')
 
         with Transaction().start(source_database, user):
+            uri = parse_uri(config.get('database', 'uri'))
             # Drop target database
             if db_exists(target_database):
                 if path:
@@ -219,13 +209,8 @@ class CreateDb(Wizard):
                 _, error = drop_db(target_database, target_username,
                     target_password)
                 if error:
-                    logger.info('Could not drop database %s. Trying to force.' %
-                        target_database)
-                    _, error = force_drop_db(target_database, target_username,
-                        target_password)
-                    if error:
-                        send_error_message(user, 'dbcopy.dropping_db_error', error)
-                        return
+                    send_error_message(user, 'dbcopy.dropping_db_error', error)
+                    return
 
             # Create target database
             _, error = create_db(target_database, target_username,
@@ -245,7 +230,8 @@ class CreateDb(Wizard):
                     datetime.now().strftime('%Y-%m-%d_%H:%M:%S'))
             logger.info('Dumping database %s into %s' % (source_database, path))
 
-            _, error = dump_db(source_database, path)
+            _, error = dump_db(source_database, path, uri.username,
+                uri.password)
             if error:
                 send_error_message(user, 'dbcopy.dumping_db_error', error)
                 if temporary:
