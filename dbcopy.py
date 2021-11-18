@@ -177,17 +177,19 @@ class CreateDb(Wizard):
             return execute_command(command, database, username, password)
 
         def restore_db(path, database, username, password):
+            # We need to give acces to the soruce_database from the target_user
+            # GRANT "source_username" TO "target_username";
             command = ['psql', '-q', '-f', path]
             logger.info('Command to restore: %s' % command)
             return execute_command(command, database, username, password)
 
-        def deactivate_crons(database):
+        def deactivate_crons(database, username, password):
             cron = Table('ir_cron')
             query = cron.update([cron.active], [False])
             query = tuple(query)[0] % query.params
             command = ['psql', '-c', query]
             logger.info('Command to deactivate crons: %s' % command)
-            return execute_command(command, database)
+            return execute_command(command, database, username, password)
 
 
         path = config.get('dbcopy', 'path')
@@ -252,7 +254,8 @@ class CreateDb(Wizard):
                 os.remove(path)
 
             # Deactivate crons on target database
-            _, error = deactivate_crons(target_database)
+            _, error = deactivate_crons(target_database, target_username,
+                target_password)
             if error:
                 raise UserError('dbcopy.connection_error')
                 return
