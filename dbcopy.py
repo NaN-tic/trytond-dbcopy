@@ -13,7 +13,7 @@ from subprocess import Popen, PIPE
 from trytond.config import config, parse_uri
 from trytond.model import ModelView, fields
 from trytond.pool import Pool
-from trytond.sendmail import sendmail
+from trytond.sendmail import sendmail_transactional
 from trytond.transaction import Transaction
 from trytond.wizard import Wizard, StateView, StateTransition, Button
 from trytond.i18n import gettext
@@ -108,28 +108,26 @@ class CreateDb(Wizard):
             msg['From'] = from_addr
             msg['Subject'] = Header(subject, 'utf-8')
             try:
-                sendmail(msg['From'],msg['To'],msg)
+                sendmail_transactional(msg['From'],msg['To'],msg)
                 logger.info('eMail delivered to %s ' % msg['To'])
             except Exception as exception:
                 logger.warning('Unable to deliver email (%s):\n %s'
                     % (exception, msg.as_string()))
 
         def send_error_message(user, message, error):
-            with Transaction().start(source_database, user):
-                message = gettext(message, source=source_database)
-                message += '\n\n'+ error.decode("ascii", "replace")
-                logger.warning(message)
-                to_addr, from_addr, subject = prepare_message(user)
-                send_message(from_addr, [to_addr], subject, message)
+            message = gettext(message, source=source_database)
+            message += '\n\n'+ error.decode("ascii", "replace")
+            logger.warning(message)
+            to_addr, from_addr, subject = prepare_message(user)
+            send_message(from_addr, [to_addr], subject, message)
 
         def send_successfully_message(user, message):
-            with Transaction().start(source_database, user):
-                message = gettext(message,
-                    source=source_database, target=target_database)
-                logger.info('Database %s cloned successfully.' %
-                    source_database)
-                to_addr, from_addr, subject = prepare_message(user)
-                send_message(from_addr, [to_addr], subject, message)
+            message = gettext(message,
+                source=source_database, target=target_database)
+            logger.info('Database %s cloned successfully.' %
+                source_database)
+            to_addr, from_addr, subject = prepare_message(user)
+            send_message(from_addr, [to_addr], subject, message)
 
         def execute_command(command, database, username=None, password=None):
             uri = parse_uri(config.get('database', 'uri'))
