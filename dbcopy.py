@@ -92,38 +92,44 @@ class CreateDb(Wizard):
             target_username, target_password):
 
         def prepare_message(user):
-            user = Pool().get('res.user')(user)
+            with Transaction().start(source_database, user):
+                pool = Pool()
+                User = pool.get('res.user')
+                user = User(user)
 
-            to_addr = user.email or config.get('email', 'from')
-            if not to_addr:
-                raise UserError('dbcopy.user_email_error', user=user.name)
-            from_addr = config.get('email', 'from')
-            subject = gettext('dbcopy.email_subject',
-                source_database=source_database)
+                to_addr = user.email or config.get('email', 'from')
+                if not to_addr:
+                    raise UserError('dbcopy.user_email_error', user=user.name)
+                from_addr = config.get('email', 'from')
+                subject = gettext('dbcopy.email_subject',
+                    source_database=source_database)
             return to_addr, from_addr, subject
 
         def send_message(from_addr, to_addr, subject, body):
-            msg = MIMEText(body, _charset='utf-8')
-            msg['To'] = ', '.join(to_addr)
-            msg['From'] = from_addr
-            msg['Subject'] = Header(subject, 'utf-8')
-            try:
-                sendmail_transactional(msg['From'],msg['To'],msg)
-                logger.info('eMail delivered to %s ' % msg['To'])
-            except Exception as exception:
-                logger.warning('Unable to deliver email (%s):\n %s'
-                    % (exception, msg.as_string()))
+            with Transaction().start(source_database, user):
+                msg = MIMEText(body, _charset='utf-8')
+                msg['To'] = ', '.join(to_addr)
+                msg['From'] = from_addr
+                msg['Subject'] = Header(subject, 'utf-8')
+                try:
+                    sendmail_transactional(msg['From'],msg['To'],msg)
+                    logger.info('eMail delivered to %s ' % msg['To'])
+                except Exception as exception:
+                    logger.warning('Unable to deliver email (%s):\n %s'
+                        % (exception, msg.as_string()))
 
         def send_error_message(user, message, error):
-            message = gettext(message, source=source_database)
+            with Transaction().start(source_database, user):
+                message = gettext(message, source=source_database)
             message += '\n\n'+ error.decode("ascii", "replace")
             logger.warning(message)
             to_addr, from_addr, subject = prepare_message(user)
             send_message(from_addr, [to_addr], subject, message)
 
         def send_successfully_message(user, message):
-            message = gettext(message,
-                source=source_database, target=target_database)
+            with Transaction().start(source_database, user):
+                message = gettext(message,
+                    source=source_database, target=target_database)
             logger.info('Database %s cloned successfully.' %
                 source_database)
             to_addr, from_addr, subject = prepare_message(user)
