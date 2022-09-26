@@ -29,7 +29,7 @@ class CreateDbStart(ModelView):
 
     database = fields.Char('Database Name', readonly=True)
     username = fields.Char('Database User')
-    password = fields.Char('Database Password')
+    password = fields.Char('Database Password', stripe=False)
 
     @staticmethod
     def default_database():
