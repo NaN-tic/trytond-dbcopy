@@ -74,7 +74,6 @@ class CreateDb(Wizard):
             raise UserError(gettext('dbcopy.cannot_overwrite'))
         if not 'test' in self.start.database:
             raise UserError(gettext('dbcopy.must_contain_test'))
-        user = transaction.user
 
         uri = parse_uri(config.get('database', 'uri'))
         if not uri.scheme == 'postgresql':
@@ -82,20 +81,21 @@ class CreateDb(Wizard):
 
         thread = threading.Thread(
                 target=self.createdb_thread,
-                args=(user, transaction.database.name, self.start.database,
-                self.start.username, self.start.password), kwargs={})
+                args=(transaction.user, transaction.database.name,
+                    self.start.database, self.start.username,
+                    self.start.password), kwargs={})
         thread.start()
         return 'result'
 
     @classmethod
-    def createdb_thread(cls, user, source_database, target_database,
+    def createdb_thread(cls, user_id, source_database, target_database,
             target_username, target_password):
 
-        def prepare_message(user):
-            with Transaction().start(source_database, user):
+        def prepare_message():
+            with Transaction().start(source_database, user_id):
                 pool = Pool()
                 User = pool.get('res.user')
-                user = User(user)
+                user = User(user_id)
 
                 to_addr = user.email or config.get('email', 'from')
                 if not to_addr:
@@ -106,7 +106,7 @@ class CreateDb(Wizard):
             return to_addr, from_addr, subject
 
         def send_message(from_addr, to_addr, subject, body):
-            with Transaction().start(source_database, user):
+            with Transaction().start(source_database, user_id):
                 msg = MIMEText(body, _charset='utf-8')
                 msg['To'] = ', '.join(to_addr)
                 msg['From'] = from_addr
@@ -118,21 +118,21 @@ class CreateDb(Wizard):
                     logger.warning('Unable to deliver email (%s):\n %s'
                         % (exception, msg.as_string()))
 
-        def send_error_message(user, message, error):
-            with Transaction().start(source_database, user):
+        def send_error_message(message, error):
+            with Transaction().start(source_database, user_id):
                 message = gettext(message, source=source_database)
             message += '\n\n'+ error.decode("ascii", "replace")
             logger.warning(message)
-            to_addr, from_addr, subject = prepare_message(user)
+            to_addr, from_addr, subject = prepare_message()
             send_message(from_addr, [to_addr], subject, message)
 
-        def send_successfully_message(user, message):
-            with Transaction().start(source_database, user):
+        def send_successfully_message(message):
+            with Transaction().start(source_database, user_id):
                 message = gettext(message,
                     source=source_database, target=target_database)
             logger.info('Database %s cloned successfully.' %
                 source_database)
-            to_addr, from_addr, subject = prepare_message(user)
+            to_addr, from_addr, subject = prepare_message()
             send_message(from_addr, [to_addr], subject, message)
 
         def execute_command(command, database, username=None, password=None):
@@ -198,7 +198,7 @@ class CreateDb(Wizard):
 
         path = config.get('dbcopy', 'path')
 
-        with Transaction().start(source_database, user):
+        with Transaction().start(source_database, user_id):
             uri = parse_uri(config.get('database', 'uri'))
             # Drop target database
             if db_exists(target_database):
@@ -210,19 +210,19 @@ class CreateDb(Wizard):
                                 datetime.now().strftime('%Y-%m-%d_%H:%M:%S'))),
                         target_username, target_password)
                     if error:
-                        send_error_message(user, 'dbcopy.dumping_db_error', error)
+                        send_error_message('dbcopy.dumping_db_error', error)
                         return
                 _, error = drop_db(target_database, target_username,
                     target_password)
                 if error:
-                    send_error_message(user, 'dbcopy.dropping_db_error', error)
+                    send_error_message('dbcopy.dropping_db_error', error)
                     return
 
             # Create target database
             _, error = create_db(target_database, target_username,
                 target_password)
             if error:
-                send_error_message(user, 'dbcopy.creating_db_error', error)
+                send_error_message('dbcopy.creating_db_error', error)
                 return
 
             # Dump source database
@@ -239,7 +239,7 @@ class CreateDb(Wizard):
             _, error = dump_db(source_database, path, uri.username,
                 uri.password)
             if error:
-                send_error_message(user, 'dbcopy.dumping_db_error', error)
+                send_error_message('dbcopy.dumping_db_error', error)
                 if temporary:
                     os.remove(path)
                 return
@@ -248,7 +248,7 @@ class CreateDb(Wizard):
             _, error = restore_db(path, target_database, target_username,
                 target_password)
             if error:
-                send_error_message(user, 'dbcopy.restoring_db_error', error)
+                send_error_message('dbcopy.restoring_db_error', error)
                 if temporary:
                     os.remove(path)
                 return
@@ -264,7 +264,7 @@ class CreateDb(Wizard):
                 raise UserError('dbcopy.connection_error')
                 return
 
-        send_successfully_message(user, 'dbcopy.db_cloned_successfully')
+        send_successfully_message('dbcopy.db_cloned_successfully')
 
     def default_result(self, fields):
         return {}
